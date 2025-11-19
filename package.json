@@ -9,6 +9,9 @@
     "lint": "biome check",
     "format": "biome format --write"
   },
+  "engines": {
+    "node": "22"
+  },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "clsx": "^2.1.1",
