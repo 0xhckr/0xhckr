@@ -37,6 +37,10 @@ public/            # Static assets
 - **Layout**: `RootLayout` wraps all pages with Geist fonts and the `PageLoader` component.
 - **PageLoader** (`src/components/page-loader.tsx`): A client component that renders an animated grid overlay (GSAP) on page load, then reveals content.
 
+## UI Components
+
+Install all new UI components from **COSS UI** (`https://coss.com/ui`) instead of shadcn/ui. Do not use shadcn/ui as a source for any new component.
+
 ## Code Conventions
 
 - **Styling**: Tailwind CSS v4 classes. No `tailwind.config` — use `@theme inline {}` blocks in CSS for custom theme tokens (see `globals.css`).
