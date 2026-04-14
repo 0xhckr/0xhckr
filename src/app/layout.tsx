@@ -28,12 +28,22 @@ export const metadata: Metadata = {
     description:
       "Software developer, homelab enthusiast, and a lover of Nix. Making things by smashing my hands on my keyboard.",
     siteName: "0xhckr",
+    images: [
+      {
+        url: `${siteUrl}/api/og?title=0xhckr&description=Mohammad%20Al-Ahdal%20%7C%20Software%20Developer`,
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "0xhckr | Mohammad Al-Ahdal | Software Developer",
     description:
       "Software developer, homelab enthusiast, and a lover of Nix. Making things by smashing my hands on my keyboard.",
+    images: [
+      `${siteUrl}/api/og?title=0xhckr&description=Mohammad%20Al-Ahdal%20%7C%20Software%20Developer`,
+    ],
   },
   robots: {
     index: true,
