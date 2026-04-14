@@ -1,14 +1,11 @@
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const title = searchParams.get("title") ?? "0xhckr";
   const description =
-    searchParams.get("description") ??
-    "Mohammad Al-Ahdal | Software Developer";
+    searchParams.get("description") ?? "Mohammad Al-Ahdal | Software Developer";
 
   return new ImageResponse(
     (
@@ -49,6 +46,7 @@ export async function GET(request: NextRequest) {
           <p
             style={{
               fontSize: 28,
+              fontWeight: 400,
               color: "#a3a3a3",
               textAlign: "center",
               margin: 0,
