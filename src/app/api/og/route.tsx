@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
             fontWeight: 400,
             fontFamily: "Departure Mono",
             color: "#a3a3a3",
-            textAlign: "center",
+            textAlign: "left",
             margin: 0,
             lineHeight: 1.4,
           }}
