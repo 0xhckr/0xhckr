@@ -58,7 +58,7 @@ const story: { id: string; lines: Line[] }[] = [
   {
     id: "projects",
     lines: [
-      { text: "What I'm working on." },
+      { text: "What I'm working on.", markdownType: "h2" },
       { text: "" },
       { text: "stoa.gg", href: "https://stoa.gg", markdownType: "link" },
       { text: "A private communications platform" },
@@ -79,20 +79,23 @@ const story: { id: string; lines: Line[] }[] = [
   {
     id: "contact",
     lines: [
-      { text: "Get in touch." },
+      {
+        text: "Get in touch.",
+        markdownType: "h2",
+      },
       { text: "" },
       {
-        text: "github/0xhckr",
+        text: "github",
         href: "https://github.com/0xhckr",
         markdownType: "link",
       },
       {
-        text: "x/0xhckrdev",
+        text: "x",
         href: "https://x.com/0xhckrdev",
         markdownType: "link",
       },
       {
-        text: "in/mohammadalahdal",
+        text: "linkedin",
         href: "https://linkedin.com/in/mohammadalahdal",
         markdownType: "link",
       },
