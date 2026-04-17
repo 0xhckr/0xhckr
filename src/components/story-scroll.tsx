@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "~/lib/util";
+import { onPageReady } from "~/lib/page-ready";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -299,8 +300,7 @@ export const StoryScroll = () => {
 
   useEffect(() => {
     let dismissed = false;
-    const onReady = () => {
-      window.removeEventListener("page-ready", onReady);
+    const cleanup = onPageReady(() => {
       const timer = setTimeout(() => {
         if (!dismissed && window.scrollY === 0) setShowScrollHint(true);
       }, 750);
@@ -313,10 +313,9 @@ export const StoryScroll = () => {
         }
       };
       window.addEventListener("scroll", onScroll, { passive: true });
-    };
-    window.addEventListener("page-ready", onReady);
+    });
     return () => {
-      window.removeEventListener("page-ready", onReady);
+      cleanup();
       setShowScrollHint(false);
     };
   }, []);
@@ -448,9 +447,7 @@ export const StoryScroll = () => {
         },
       });
 
-      const onReady = () => {
-        window.removeEventListener("page-ready", onReady);
-
+      onPageReady(() => {
         if (firstLineChars.length === 0) {
           scrollReadyRef.current = true;
           return;
@@ -468,9 +465,7 @@ export const StoryScroll = () => {
             moveCursor(firstLineChars[i]);
           }, i * 0.04);
         }
-      };
-
-      window.addEventListener("page-ready", onReady);
+      });
     },
     { scope: containerRef },
   );
