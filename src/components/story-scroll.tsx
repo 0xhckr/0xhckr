@@ -113,31 +113,23 @@ interface SectionMeta {
   charCount: number;
 }
 
+const lineFullText = (l: Line) => {
+  const prefix = l.markdownType === "h1" ? "# " : l.markdownType === "h2" ? "## " : l.markdownType === "h3" ? "### " : l.markdownType === "comment" ? "<!-- " : l.markdownType === "link" ? "[" : "";
+  const suffix = l.markdownType === "link" ? `](${l.href})` : l.markdownType === "comment" ? " -->" : "";
+  return `${prefix}${l.text}${suffix}`;
+};
+
+const twCharCount = (s: string) => s.replace(/ /g, "").length;
+
 const sectionMeta: SectionMeta[] = [];
 for (const section of story) {
   const charCount = section.lines
     .filter((l) => l.text.length > 0)
-    .reduce(
-      (sum, l) =>
-        sum +
-        l.text.length +
-        (l.markdownType === "h1"
-          ? 2 // #
-          : l.markdownType === "h2"
-            ? 3 // ##
-            : l.markdownType === "h3"
-              ? 4 // ###
-              : l.markdownType === "comment"
-                ? 9 // <!--content-->
-                : l.markdownType === "link"
-                  ? 4 + (l.href?.length ?? 0)
-                  : 0),
-      0,
-    );
+    .reduce((sum, l) => sum + twCharCount(lineFullText(l)), 0);
   sectionMeta.push({ charCount });
 }
 
-const firstLineCount = story[0].lines[0].text.length + 2;
+const firstLineCount = twCharCount(lineFullText(story[0].lines[0]));
 
 interface ScrollRange {
   type: "section" | "gap";
@@ -236,11 +228,18 @@ const TypewriterLine = ({
       : markdownType === "comment"
         ? " -->"
         : "";
-  const chars = `${prefix}${text}${suffix}`.split("").map((char, i) => (
-    <span key={i} className={classes} aria-hidden="true">
-      {char === " " ? "\u00A0" : char}
-    </span>
-  ));
+  const full = `${prefix}${text}${suffix}`;
+  const words = full.split(" ");
+  const chars = words.flatMap((word, wIdx) => [
+    <span key={`w-${wIdx}`} className="whitespace-nowrap">
+      {word.split("").map((char, cIdx) => (
+        <span key={`${wIdx}-${cIdx}`} className={classes} aria-hidden="true">
+          {char}
+        </span>
+      ))}
+    </span>,
+    wIdx < words.length - 1 ? " " : null,
+  ]).filter(Boolean);
   if (href) {
     const isExternal = !href.startsWith("mailto:");
     return (

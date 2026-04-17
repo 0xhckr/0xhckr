@@ -56,17 +56,22 @@ export const PageHeading = ({
 
   if (inline) {
     return (
-      <div ref={containerRef} className="relative">
+      <div ref={containerRef} className="relative tw-content">
         <h1>
-          {`# ${text}`.split("").map((char, i) => (
-            <span
-              key={i}
-              className="tw-char inline-block text-2xl sm:text-4xl font-bold text-[#003c3c] dark:text-[#5eead4]"
-              aria-hidden="true"
-            >
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))}
+          {(`# ${text}`.split(" ").flatMap((word, wIdx) => [
+            <span key={`w-${wIdx}`} className="whitespace-nowrap">
+              {word.split("").map((char, cIdx) => (
+                <span
+                  key={`${wIdx}-${cIdx}`}
+                  className="tw-char inline-block text-2xl sm:text-4xl font-bold text-[#003c3c] dark:text-[#5eead4]"
+                  aria-hidden="true"
+                >
+                  {char}
+                </span>
+              ))}
+            </span>,
+            wIdx < `# ${text}`.split(" ").length - 1 ? " " : null,
+          ])).filter(Boolean)}
           <span className="sr-only">{text}</span>
         </h1>
         <span
@@ -86,15 +91,20 @@ export const PageHeading = ({
           className="tw-content relative w-full max-w-2xl overflow-hidden lowercase"
         >
           <h1>
-            {`# ${text}`.split("").map((char, i) => (
-              <span
-                key={i}
-                className="tw-char inline-block text-2xl sm:text-4xl font-bold text-[#003c3c] dark:text-[#5eead4]"
-                aria-hidden="true"
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
+            {(`# ${text}`.split(" ").flatMap((word, wIdx) => [
+              <span key={`w-${wIdx}`} className="whitespace-nowrap">
+                {word.split("").map((char, cIdx) => (
+                  <span
+                    key={`${wIdx}-${cIdx}`}
+                    className="tw-char inline-block text-2xl sm:text-4xl font-bold text-[#003c3c] dark:text-[#5eead4]"
+                    aria-hidden="true"
+                  >
+                    {char}
+                  </span>
+                ))}
+              </span>,
+              wIdx < `# ${text}`.split(" ").length - 1 ? " " : null,
+            ])).filter(Boolean)}
             <span className="sr-only">{text}</span>
           </h1>
           <span

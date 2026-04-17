@@ -73,28 +73,38 @@ export const TypewriterProjects = ({ projects }: TypewriterProjectsProps) => {
             aria-label={project.title}
           >
             {`[${project.title}](${project.link})`
-              .split("")
-              .map((char, i) => (
-                <span
-                  key={`l-${pIdx}-${i}`}
-                  className="tw-char inline-block text-[#2e6b7b] dark:text-[#7dd3e0]"
-                  aria-hidden="true"
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              ))}
+              .split(" ")
+              .flatMap((word, wIdx) => [
+                <span key={`lw-${pIdx}-${wIdx}`} className="whitespace-nowrap">
+                  {word.split("").map((char, cIdx) => (
+                    <span
+                      key={`l-${pIdx}-${wIdx}-${cIdx}`}
+                      className="tw-char inline-block text-[#2e6b7b] dark:text-[#7dd3e0]"
+                      aria-hidden="true"
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>,
+                wIdx < `[${project.title}](${project.link})`.split(" ").length - 1 ? " " : null,
+              ]).filter(Boolean)}
             <span className="sr-only">{project.title}</span>
           </a>
           <div className="mt-1">
-            {project.description.split("").map((char, i) => (
-              <span
-                key={`d-${pIdx}-${i}`}
-                className="tw-char inline-block"
-                aria-hidden="true"
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
+            {project.description.split(" ").flatMap((word, wIdx) => [
+                <span key={`dw-${pIdx}-${wIdx}`} className="whitespace-nowrap">
+                  {word.split("").map((char, cIdx) => (
+                    <span
+                      key={`d-${pIdx}-${wIdx}-${cIdx}`}
+                      className="tw-char inline-block"
+                      aria-hidden="true"
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>,
+                wIdx < project.description.split(" ").length - 1 ? " " : null,
+              ]).filter(Boolean)}
             <span className="sr-only">{project.description}</span>
           </div>
         </div>
