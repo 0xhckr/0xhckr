@@ -1,6 +1,4 @@
 import { ImageResponse } from "next/og";
-import fs from "node:fs";
-import path from "node:path";
 import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,9 +7,9 @@ export async function GET(request: NextRequest) {
   const description =
     searchParams.get("description") ?? "Mohammad Al-Ahdal | Software Developer";
 
-  const fontData = fs.readFileSync(
-    path.join(process.cwd(), "src/fonts/DepartureMono-Regular.otf"),
-  );
+  const origin = request.nextUrl.origin;
+  const fontRes = await fetch(`${origin}/fonts/DepartureMono-Regular.otf`);
+  const fontData = await fontRes.arrayBuffer();
 
   return new ImageResponse(
     <div
