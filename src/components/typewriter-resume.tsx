@@ -143,6 +143,12 @@ export const TypewriterResume = ({ data }: TypewriterResumeProps) => {
 
   return (
     <div ref={containerRef} className="mt-8 space-y-10">
+      {/* Profile */}
+      <div className="tw-resume-section">
+        <Heading text="## profile" />
+        <TypewriterText text={data.profile} />
+      </div>
+
       {/* Experience */}
       <div className="tw-resume-section">
         <Heading text="## experience" />
@@ -158,13 +164,23 @@ export const TypewriterResume = ({ data }: TypewriterResumeProps) => {
                 </div>
                 <div className="whitespace-nowrap shrink-0">
                   <TypewriterText
-                    text={`${exp.years.start} — ${exp.years.end}`}
+                    text={`${exp.years.start} - ${exp.years.end}`}
                     className="text-xs sm:text-sm text-foreground/50"
                   />
                 </div>
               </div>
               <div className="mt-1">
-                <TypewriterText text={exp.description} />
+                {typeof exp.description === "string" ? (
+                  <TypewriterText text={exp.description} />
+                ) : (
+                  <ul className="list-disc list-inside space-y-1">
+                    {exp.description.map((item, i) => (
+                      <li key={i}>
+                        <TypewriterText text={item} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           ))}

@@ -6,7 +6,7 @@ import { generatePageMetadata } from "~/lib/metadata";
 export const metadata: Metadata = generatePageMetadata({
   title: "Showcase",
   description:
-    "A collection of projects I've built — from communications platforms to developer tools.",
+    "A collection of projects I've built - from communications platforms to developer tools.",
   path: "/showcase",
 });
 
