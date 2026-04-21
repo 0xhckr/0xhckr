@@ -55,3 +55,11 @@ Install all new UI components from **COSS UI** (`https://coss.com/ui`) instead o
 - **sharp is ignored**: `pnpm-workspace.yaml` ignores the `sharp` dependency (Next.js image optimization uses it but it can fail in Nix environments).
 - **Biome domains**: The linter has Next.js and React recommended rule domains enabled — it will catch Next-specific issues.
 - **`noUnknownAtRules` is off**: Biome's CSS lint rule for unknown at-rules is disabled because Tailwind v4 uses at-rules like `@theme` that Biome doesn't recognize.
+
+<!-- convex-ai-start -->
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+<!-- convex-ai-end -->
