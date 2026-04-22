@@ -1,12 +1,18 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Providers } from "~/components/providers";
 import { PageLoader } from "~/components/page-loader";
 import { Navbar } from "~/components/navbar";
 import { AdminNavbar } from "~/components/admin-navbar";
 import "./globals.css";
+import { cn } from "~/lib/utils";
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -75,7 +81,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="ltr">
+    <html
+      lang="en"
+      dir="ltr"
+      className={cn(
+        "font-mono",
+        dmSans.variable,
+        departureMono.variable,
+        jetbrainsMono.variable,
+        "dark",
+      )}
+    >
       <head>
         <script
           type="application/ld+json"
