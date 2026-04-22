@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import { Providers } from "~/components/providers";
 import { PageLoader } from "~/components/page-loader";
 import { Navbar } from "~/components/navbar";
+import { AdminNavbar } from "~/components/admin-navbar";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -110,6 +111,7 @@ export default function RootLayout({
           <Providers>
             <PageLoader>
               <Navbar />
+              <AdminNavbar />
               <main>{children}</main>
             </PageLoader>
           </Providers>

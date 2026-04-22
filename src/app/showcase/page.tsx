@@ -32,7 +32,7 @@ export default function Showcase() {
   return (
     <main id="main-content" tabIndex={-1}>
       <div className="flex min-h-screen flex-col items-center px-4 sm:px-8">
-        <div className="tw-content my-auto w-full max-w-2xl lowercase pb-navbar">
+        <div className="tw-content my-auto w-full max-w-2xl lowercase pb-navbar pt-admin-navbar">
           <PageHeading text="Showcase" inline />
           <TypewriterProjects projects={projects} />
         </div>

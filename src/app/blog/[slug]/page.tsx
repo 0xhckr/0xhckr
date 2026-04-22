@@ -38,7 +38,7 @@ export default async function BlogPost({ params }: PageProps) {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <article className="mx-auto max-w-2xl px-4 pb-navbar pt-16 sm:px-8">
+      <article className="mx-auto max-w-2xl px-4 pb-navbar pt-admin-navbar sm:px-8">
         <header className="mb-8">
           <PageHeading text={post.meta.title} inline />
           <time
