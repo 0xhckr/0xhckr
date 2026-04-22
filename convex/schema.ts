@@ -6,5 +6,14 @@ export default defineSchema({
     content: v.string(),
     createdAt: v.number(),
     isFrontFacing: v.boolean(),
+    jobPosting: v.optional(v.id("jobPostings")),
+  }),
+  jobPostings: defineTable({
+    title: v.string(),
+    description: v.string(),
+    company: v.string(),
+    location: v.optional(v.string()),
+    createdAt: v.number(),
+    postingPostedAt: v.optional(v.number()),
   }),
 });
