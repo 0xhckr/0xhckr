@@ -6,47 +6,51 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-    }:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+  }:
     flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in
-      {
+      system: let
+        pkgs = import nixpkgs {inherit system;};
+      in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             pnpm
             nodejs_22
             biome
+            worker-build
           ];
 
           shellHook = ''
-            nix run --extra-experimental-features nix-command --extra-experimental-features flakes .#install;
+            # Force the dynamic linker to use nix-ld
+            export NIX_LD=$(nix eval --raw nixpkgs#stdenv.cc.bintools.dynamicLinker)
+            export NIX_LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath (with pkgs; [
+              stdenv.cc.cc
+              openssl
+              zlib
+            ])}"
+
+            echo "Next.js + Turbopack environment ready"
           '';
         };
-        apps = {
-          install = let
-            install = pkgs.writeShellScript "install" ''
-              ${pkgs.pnpm}/bin/pnpm install;
-            '';
-          in {
-            type = "app";
-            program = "${install}";
-          };
 
-          dev = let 
-            dev = pkgs.writeShellScript "dev" ''
-              ${pkgs.pnpm}/bin/pnpm dev;
-            '';
-          in {
+        # Simplified apps for clarity
+        apps = let
+          # Helper function to wrap pnpm commands with necessary env vars
+          wrapPnpm = cmd: {
             type = "app";
-            program = "${dev}";
+            program = "${pkgs.writeShellScript "${cmd}" ''
+              export NIX_LD=$(nix eval --raw nixpkgs#stdenv.cc.bintools.dynamicLinker)
+              export NIX_LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath (with pkgs; [stdenv.cc.cc openssl zlib])}"
+              ${pkgs.pnpm}/bin/pnpm ${cmd}
+            ''}";
           };
+        in {
+          install = wrapPnpm "install";
+          dev = wrapPnpm "dev";
+          build = wrapPnpm "run build";
         };
       }
     );
