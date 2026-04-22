@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 export const create = mutation({
   args: {
@@ -41,6 +42,64 @@ export const getFrontFacing = query({
         .order("desc")
         .collect()
     )[0];
+  },
+});
+
+export const get = query({
+  args: { id: v.id("resumes") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return null;
+    }
+    return await ctx.db.get(args.id);
+  },
+});
+
+export const update = mutation({
+  args: {
+    id: v.id("resumes"),
+    content: v.string(),
+    isFrontFacing: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.db.patch(args.id, {
+      content: args.content,
+      isFrontFacing: args.isFrontFacing,
+    });
+  },
+});
+
+export const remove = mutation({
+  args: { id: v.id("resumes") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    await ctx.db.delete(args.id);
+  },
+});
+
+export const setFrontFacing = mutation({
+  args: { id: v.id("resumes") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+    const current = await ctx.db
+      .query("resumes")
+      .filter((q) => q.eq(q.field("isFrontFacing"), true))
+      .first();
+    if (current && current._id !== args.id) {
+      await ctx.db.patch(current._id, { isFrontFacing: false });
+    }
+    await ctx.db.patch(args.id, { isFrontFacing: true });
   },
 });
 

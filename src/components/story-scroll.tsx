@@ -317,8 +317,11 @@ export const StoryScroll = () => {
 
   useEffect(() => {
     let dismissed = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let removeScroll: (() => void) | undefined;
+
     const cleanup = onPageReady(() => {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         if (!dismissed && window.scrollY === 0) setShowScrollHint(true);
       }, 750);
       const onScroll = () => {
@@ -330,8 +333,11 @@ export const StoryScroll = () => {
         }
       };
       window.addEventListener("scroll", onScroll, { passive: true });
+      removeScroll = () => window.removeEventListener("scroll", onScroll);
     });
     return () => {
+      clearTimeout(timer);
+      removeScroll?.();
       cleanup();
       setShowScrollHint(false);
     };
