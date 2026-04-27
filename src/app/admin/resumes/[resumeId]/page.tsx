@@ -482,10 +482,12 @@ export default function EditResumePage() {
   const params = useParams<{ resumeId: Id<"resumes"> }>();
   const router = useRouter();
   const resume = useQuery(api.resumes.get, { id: params.resumeId });
+  const jobPostings = useQuery(api.jobPostings.list);
   const updateResume = useMutation(api.resumes.update);
   const removeResume = useMutation(api.resumes.remove);
 
   const [draft, setDraft] = useState<ResumeData>(blankResume);
+  const [selectedJobPosting, setSelectedJobPosting] = useState<Id<"jobPostings"> | null>(null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -497,6 +499,7 @@ export default function EditResumePage() {
     } catch {
       setDraft(blankResume);
     }
+    setSelectedJobPosting(resume.jobPosting ?? null);
     setDirty(false);
   }, [resume]);
 
@@ -534,6 +537,7 @@ export default function EditResumePage() {
         id: params.resumeId,
         content,
         isFrontFacing: resume.isFrontFacing,
+        jobPosting: selectedJobPosting ?? undefined,
       });
       setDirty(false);
     } catch (err) {
@@ -628,19 +632,7 @@ export default function EditResumePage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              {dirty && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  <Save className="size-3.5" />
-                  {saving ? "saving..." : "save"}
-                </Button>
-              )}
-            </div>
+            <div className="flex items-center gap-2" />
           </div>
 
           {/* Actions Bar */}
@@ -653,6 +645,32 @@ export default function EditResumePage() {
               discard changes
             </Button>
           </div>
+
+          {/* Job Posting */}
+          <section>
+            <SectionHeader title="Job Posting" />
+            {resume.isFrontFacing ? (
+              <p className="text-xs text-muted-foreground lowercase">
+                The live resume cannot be linked to a job posting.
+              </p>
+            ) : (
+              <select
+                value={selectedJobPosting ?? ""}
+                onChange={(e) => {
+                  setSelectedJobPosting((e.target.value || null) as Id<"jobPostings"> | null);
+                  setDirty(true);
+                }}
+                className="w-full rounded-none bg-transparent px-3 py-2 text-sm lowercase focus:outline-none"
+              >
+                <option value="">None</option>
+                {jobPostings?.map((posting) => (
+                  <option key={posting._id} value={posting._id}>
+                    {posting.title || "Untitled"} — {posting.company}
+                  </option>
+                ))}
+              </select>
+            )}
+          </section>
 
           {/* Editor Content */}
           <div className="space-y-10">

@@ -61,15 +61,21 @@ export const update = mutation({
     id: v.id("resumes"),
     content: v.string(),
     isFrontFacing: v.boolean(),
+    jobPosting: v.optional(v.id("jobPostings")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
+    const existing = await ctx.db.get(args.id);
+    if (existing?.isFrontFacing && args.jobPosting) {
+      throw new Error("Cannot link a job posting to the live resume");
+    }
     await ctx.db.patch(args.id, {
       content: args.content,
       isFrontFacing: args.isFrontFacing,
+      jobPosting: args.jobPosting,
     });
   },
 });

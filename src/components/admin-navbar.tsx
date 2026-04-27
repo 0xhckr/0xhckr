@@ -10,7 +10,10 @@ import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP);
 
-const adminLinks = [{ href: "/admin/resumes", label: "resumes" }];
+const adminLinks = [
+  { href: "/admin/resumes", label: "resumes" },
+  { href: "/admin/job-postings", label: "jobs" },
+];
 
 export function AdminNavbar() {
   const pathname = usePathname();
