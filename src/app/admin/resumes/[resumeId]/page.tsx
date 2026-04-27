@@ -711,7 +711,7 @@ export default function EditResumePage() {
                 <option value="">None</option>
                 {jobPostings?.map((posting) => (
                   <option key={posting._id} value={posting._id}>
-                    {posting.title || "Untitled"} — {posting.company}
+                    {posting.title || "Untitled"} {posting.company}
                   </option>
                 ))}
               </select>

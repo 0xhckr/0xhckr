@@ -12,6 +12,7 @@ gsap.registerPlugin(useGSAP);
 
 const adminLinks = [
   { href: "/admin/resumes", label: "resumes" },
+  { href: "/admin/cover-letters", label: "letters" },
   { href: "/admin/job-postings", label: "jobs" },
 ];
 

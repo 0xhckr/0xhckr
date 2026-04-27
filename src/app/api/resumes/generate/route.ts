@@ -147,7 +147,7 @@ ${jobPosting.description}`;
 Instructions:
 - Tailor the profile summary to match the target role
 - Reorder and emphasize relevant experiences
-- Keep all factual information accurate — do not invent experiences, skills, or qualifications
+- Keep all factual information accurate - do not invent experiences, skills, or qualifications
 - Adjust the skills section to highlight the most relevant skills for this role, but do not add skills that aren't in the master resume
 - Output must match the JSON schema exactly
 - For years.end, use a string number like "2024" or "Present"
@@ -176,7 +176,9 @@ Instructions:
     });
 
     if (!res.ok) {
-      throw new Error(`OpenRouter API error: ${res.status} ${await res.text()}`);
+      throw new Error(
+        `OpenRouter API error: ${res.status} ${await res.text()}`,
+      );
     }
 
     const data = await res.json();
@@ -193,17 +195,22 @@ Instructions:
         ...exp,
         years: {
           start: exp.years.start,
-          end: exp.years.end === "Present" ? "Present" as const : Number(exp.years.end),
+          end:
+            exp.years.end === "Present"
+              ? ("Present" as const)
+              : Number(exp.years.end),
         },
         description: exp.description,
       })),
       skills: parsed.skills,
-      education: parsed.education.isNull ? null : {
-        universityName: parsed.education.universityName,
-        progression: parsed.education.progression,
-        degreeName: parsed.education.degreeName,
-        ...(parsed.education.gpa ? { gpa: parsed.education.gpa } : {}),
-      },
+      education: parsed.education.isNull
+        ? null
+        : {
+            universityName: parsed.education.universityName,
+            progression: parsed.education.progression,
+            degreeName: parsed.education.degreeName,
+            ...(parsed.education.gpa ? { gpa: parsed.education.gpa } : {}),
+          },
     };
 
     return Response.json(result);

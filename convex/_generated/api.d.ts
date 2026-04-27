@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as coverLetters from "../coverLetters.js";
 import type * as jobPostings from "../jobPostings.js";
 import type * as resumes from "../resumes.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  coverLetters: typeof coverLetters;
   jobPostings: typeof jobPostings;
   resumes: typeof resumes;
 }>;

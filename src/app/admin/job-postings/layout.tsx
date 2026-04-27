@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { generatePageMetadata } from "~/lib/metadata";
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Admin — Job Postings",
+  title: "Admin - Job Postings",
   description: "Manage job postings.",
   path: "/admin/job-postings",
 });

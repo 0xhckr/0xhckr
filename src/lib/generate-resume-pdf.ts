@@ -73,7 +73,6 @@ export async function generateResumePDF(data: ResumeData): Promise<jsPDF> {
   const LEFT_X = MARGIN;
   const SIDE_X = MARGIN + MAIN_WIDTH + 8;
 
-
   const checkPageMain = (needed: number) => {
     if (mainY + needed > 297 - MARGIN) {
       doc.addPage();
@@ -231,7 +230,7 @@ export async function generateResumePDF(data: ResumeData): Promise<jsPDF> {
     }
   };
 
-  // Header — full width
+  // Header - full width
   font("bold");
   doc.setFontSize(24);
   doc.setTextColor(...hexToRgb(ACCENT));

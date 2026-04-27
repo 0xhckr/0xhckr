@@ -4,14 +4,14 @@ import { redirect } from "next/navigation";
 import { generatePageMetadata } from "~/lib/metadata";
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Admin - Resumes",
-  description: "Manage resumes.",
-  path: "/admin/resumes",
+  title: "Admin - Cover Letters",
+  description: "Manage cover letters.",
+  path: "/admin/cover-letters",
 });
 
 const ALLOWED_EMAIL = "hackr@hackr.sh";
 
-export default async function AdminResumesLayout({
+export default async function AdminCoverLettersLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -217,7 +217,7 @@
 
 .blog-prose ul li::marker {
   color: var(--foreground);
-  content: "— ";
+  content: "- ";
 }
 
 .blog-prose pre {
