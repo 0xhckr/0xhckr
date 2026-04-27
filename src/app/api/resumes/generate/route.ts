@@ -33,9 +33,9 @@ const resumeDataSchema = z.object({
       company: z.string(),
       years: z.object({
         start: z.number(),
-        end: z.union([z.number(), z.literal("Present")]),
+        end: z.string(),
       }),
-      description: z.union([z.string(), z.array(z.string())]),
+      description: z.array(z.string()),
       address: z.string().optional(),
     }),
   ),
@@ -46,14 +46,13 @@ const resumeDataSchema = z.object({
       isExpert: z.boolean(),
     }),
   ),
-  education: z
-    .object({
-      universityName: z.string(),
-      progression: z.string(),
-      degreeName: z.string(),
-      gpa: z.string().optional(),
-    })
-    .nullable(),
+  education: z.object({
+    universityName: z.string(),
+    progression: z.string(),
+    degreeName: z.string(),
+    gpa: z.string().optional(),
+    isNull: z.boolean(),
+  }),
 });
 
 const RESUME_JSON_SCHEMA = {
@@ -71,12 +70,13 @@ const RESUME_JSON_SCHEMA = {
             type: "object",
             properties: {
               start: { type: "number" },
-              end: { oneOf: [{ type: "number" }, { const: "Present" }] },
+              end: { type: "string" },
             },
             required: ["start", "end"],
           },
           description: {
-            oneOf: [{ type: "string" }, { type: "array", items: { type: "string" } }],
+            type: "array",
+            items: { type: "string" },
           },
           address: { type: "string" },
         },
@@ -96,19 +96,15 @@ const RESUME_JSON_SCHEMA = {
       },
     },
     education: {
-      oneOf: [
-        { type: "null" },
-        {
-          type: "object",
-          properties: {
-            universityName: { type: "string" },
-            progression: { type: "string" },
-            degreeName: { type: "string" },
-            gpa: { type: "string" },
-          },
-          required: ["universityName", "progression", "degreeName"],
-        },
-      ],
+      type: "object",
+      properties: {
+        universityName: { type: "string" },
+        progression: { type: "string" },
+        degreeName: { type: "string" },
+        gpa: { type: "string" },
+        isNull: { type: "boolean" },
+      },
+      required: ["universityName", "progression", "degreeName", "isNull"],
     },
   },
   required: ["profile", "experiences", "skills", "education"],
@@ -153,7 +149,10 @@ Instructions:
 - Reorder and emphasize relevant experiences
 - Keep all factual information accurate — do not invent experiences, skills, or qualifications
 - Adjust the skills section to highlight the most relevant skills for this role, but do not add skills that aren't in the master resume
-- Output must match the JSON schema exactly`;
+- Output must match the JSON schema exactly
+- For years.end, use a string number like "2024" or "Present"
+- For description, always use an array of strings
+- For education, set isNull to true if no education should be shown, otherwise provide the fields and set isNull to false`;
 
   try {
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -187,7 +186,27 @@ Instructions:
     }
 
     const parsed = resumeDataSchema.parse(JSON.parse(content));
-    return Response.json(parsed);
+
+    const result = {
+      profile: parsed.profile,
+      experiences: parsed.experiences.map((exp) => ({
+        ...exp,
+        years: {
+          start: exp.years.start,
+          end: exp.years.end === "Present" ? "Present" as const : Number(exp.years.end),
+        },
+        description: exp.description,
+      })),
+      skills: parsed.skills,
+      education: parsed.education.isNull ? null : {
+        universityName: parsed.education.universityName,
+        progression: parsed.education.progression,
+        degreeName: parsed.education.degreeName,
+        ...(parsed.education.gpa ? { gpa: parsed.education.gpa } : {}),
+      },
+    };
+
+    return Response.json(result);
   } catch (err) {
     console.error("Resume generation failed:", err);
     return Response.json(
