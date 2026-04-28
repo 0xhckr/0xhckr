@@ -80,7 +80,13 @@ export default function AdminResumesPage() {
                       )}
                     </span>
                     <div className="flex items-center gap-2">
-                      {data && <DownloadResumeButton data={data} />}
+                      {data && (
+                        <DownloadResumeButton
+                          data={data}
+                          company={resume.jobPosting ? jobPostings?.find((j) => j._id === resume.jobPosting)?.company : undefined}
+                          position={resume.jobPosting ? jobPostings?.find((j) => j._id === resume.jobPosting)?.title : undefined}
+                        />
+                      )}
                       {resume.jobPosting && (
                         <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-500">
                           {(() => {

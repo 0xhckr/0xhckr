@@ -642,7 +642,11 @@ export default function EditResumePage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <DownloadResumeButton data={draft} />
+              <DownloadResumeButton
+                data={draft}
+                company={selectedJobPosting ? jobPostings?.find((j) => j._id === selectedJobPosting)?.company : undefined}
+                position={selectedJobPosting ? jobPostings?.find((j) => j._id === selectedJobPosting)?.title : undefined}
+              />
             </div>
           </div>
 

@@ -18,10 +18,11 @@ export const DownloadCoverLetterButton = ({
 }: DownloadCoverLetterButtonProps) => {
   const handleClick = useCallback(async () => {
     const doc = await generateCoverLetterPDF({ content, jobTitle, company });
-    const filename = company
-      ? `cover-letter-${company.toLowerCase().replace(/\s+/g, "-")}.pdf`
-      : "cover-letter-mohammad-alahdal.pdf";
-    doc.save(filename);
+    const parts = ["Mohammad_Al-Ahdal"];
+    if (company) parts.push(company.replace(/\s+/g, "_"));
+    if (jobTitle) parts.push(jobTitle.replace(/\s+/g, "_"));
+    parts.push("CoverLetter");
+    doc.save(`${parts.join("_")}.pdf`);
   }, [content, jobTitle, company]);
 
   return (
