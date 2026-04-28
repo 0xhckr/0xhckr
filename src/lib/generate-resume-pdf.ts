@@ -244,6 +244,7 @@ export async function generateResumePDF(data: ResumeData): Promise<jsPDF> {
   mainY += 5;
 
   const links = [
+    { label: "0xhckr.dev", url: "https://0xhckr.dev" },
     { label: "github.com/0xhckr", url: "https://github.com/0xhckr" },
     { label: "x.com/0xhckrdev", url: "https://x.com/0xhckrdev" },
     {
