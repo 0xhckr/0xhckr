@@ -152,7 +152,7 @@ export function Navbar() {
               ))}
             </Link>
           ))}
-          {isLoaded && isSignedIn && (
+          {isLoaded && isSignedIn ? (
             <SignOutButton redirectUrl="/">
               <span
                 className={cn(
@@ -166,8 +166,7 @@ export function Navbar() {
                 ))}
               </span>
             </SignOutButton>
-          )}
-          {isLoaded && !isSignedIn && (
+          ) : (
             <SignInButton mode="modal">
               <span
                 className={cn(
