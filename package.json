@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "convex deploy --yes && next build && opennextjs-cloudflare build --skipBuild",
+    "build": "convex deploy --yes && next build",
+    "cf-build": "convex deploy --yes && opennextjs-cloudflare build",
     "dev": "next dev",
     "start": "next start",
     "lint": "biome check",
