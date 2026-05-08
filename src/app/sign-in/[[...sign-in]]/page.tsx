@@ -2,7 +2,7 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950">
+    <div className="flex min-h-screen items-center justify-center">
       <SignIn
         appearance={{
           variables: {
@@ -13,6 +13,16 @@ export default function SignInPage() {
             colorText: "#ffffff",
             colorTextSecondary: "#a3a3a3",
             colorNeutral: "#ffffff",
+          },
+          elements: {
+            headerTitle: "!text-white",
+            headerSubtitle: "!text-neutral-400",
+            socialButtonsBlockButtonText: "!text-white",
+            socialButtonsBlockButtonArrow: "!text-white",
+            footerActionText: "!text-neutral-400",
+            footerActionLink: "!text-white hover:!text-neutral-300",
+            identityPreviewText: "!text-white",
+            formFieldLabel: "!text-neutral-300",
           },
         }}
       />
