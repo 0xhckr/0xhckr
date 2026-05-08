@@ -3,7 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 export const runtime = "experimental-edge";
 
 export const config = {
-  matcher: ["/admin(.*)"],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
 
 const isProtectedRoute = createRouteMatcher(["/admin(.*)"]);
