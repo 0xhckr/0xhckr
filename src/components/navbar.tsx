@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
+import { SignOutButton, useAuth } from "@clerk/nextjs";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Link from "next/link";
@@ -152,7 +152,7 @@ export function Navbar() {
               ))}
             </Link>
           ))}
-          {isLoaded && (
+          {isLoaded ? (
             isSignedIn ? (
               <SignOutButton redirectUrl="/">
                 <span
@@ -168,20 +168,28 @@ export function Navbar() {
                 </span>
               </SignOutButton>
             ) : (
-              <SignInButton mode="modal">
-                <span
-                  className={cn(
-                    "inline-flex cursor-pointer hover:text-foreground/80 transition-colors",
-                  )}
-                >
-                  {"login".split("").map((char, i) => (
-                    <span key={i} className="nav-char inline-block">
-                      {char}
-                    </span>
-                  ))}
-                </span>
-              </SignInButton>
+              <Link
+                href="/sign-in"
+                className="inline-flex hover:text-foreground/80 transition-colors"
+              >
+                {"login".split("").map((char, i) => (
+                  <span key={i} className="nav-char inline-block">
+                    {char}
+                  </span>
+                ))}
+              </Link>
             )
+          ) : (
+            <Link
+              href="/sign-in"
+              className="inline-flex hover:text-foreground/80 transition-colors"
+            >
+              {"login".split("").map((char, i) => (
+                <span key={i} className="nav-char inline-block">
+                  {char}
+                </span>
+              ))}
+            </Link>
           )}
         </span>
       </div>
