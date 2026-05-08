@@ -123,7 +123,11 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${departureMono.variable} antialiased`}
       >
-        <ClerkProvider>
+        <ClerkProvider
+          signInUrl="/sign-in"
+          signUpUrl="/sign-in"
+          afterSignOutUrl="/"
+        >
           <Providers>
             <PageLoader>
               <Navbar />
