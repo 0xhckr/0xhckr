@@ -127,6 +127,7 @@ export default function RootLayout({
           signInUrl="/sign-in"
           signUpUrl="/sign-in"
           afterSignOutUrl="/"
+          {...({ __internal_invokeMiddlewareOnAuthStateChange: false } as object)}
         >
           <Providers>
             <PageLoader>
