@@ -152,34 +152,36 @@ export function Navbar() {
               ))}
             </Link>
           ))}
-          {isLoaded && isSignedIn ? (
-            <SignOutButton redirectUrl="/">
-              <span
-                className={cn(
-                  "inline-flex cursor-pointer hover:text-foreground/80 transition-colors",
-                )}
-              >
-                {"sign-out".split("").map((char, i) => (
-                  <span key={i} className="nav-char inline-block">
-                    {char}
-                  </span>
-                ))}
-              </span>
-            </SignOutButton>
-          ) : (
-            <SignInButton mode="modal">
-              <span
-                className={cn(
-                  "inline-flex cursor-pointer hover:text-foreground/80 transition-colors",
-                )}
-              >
-                {"login".split("").map((char, i) => (
-                  <span key={i} className="nav-char inline-block">
-                    {char}
-                  </span>
-                ))}
-              </span>
-            </SignInButton>
+          {isLoaded && (
+            isSignedIn ? (
+              <SignOutButton redirectUrl="/">
+                <span
+                  className={cn(
+                    "inline-flex cursor-pointer hover:text-foreground/80 transition-colors",
+                  )}
+                >
+                  {"sign-out".split("").map((char, i) => (
+                    <span key={i} className="nav-char inline-block">
+                      {char}
+                    </span>
+                  ))}
+                </span>
+              </SignOutButton>
+            ) : (
+              <SignInButton mode="modal">
+                <span
+                  className={cn(
+                    "inline-flex cursor-pointer hover:text-foreground/80 transition-colors",
+                  )}
+                >
+                  {"login".split("").map((char, i) => (
+                    <span key={i} className="nav-char inline-block">
+                      {char}
+                    </span>
+                  ))}
+                </span>
+              </SignInButton>
+            )
           )}
         </span>
       </div>
