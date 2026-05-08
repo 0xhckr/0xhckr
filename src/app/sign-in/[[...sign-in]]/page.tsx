@@ -7,25 +7,27 @@ export default function SignInPage() {
         appearance={{
           variables: {
             colorPrimary: "#ededed",
-            colorBackground: "#000000",
-            colorInputBackground: "#111111",
+            colorBackground: "#0f0f0f",
+            colorInputBackground: "#1a1a1a",
             colorInputText: "#ededed",
+            colorText: "#ededed",
+            colorTextSecondary: "#a3a3a3",
           },
           elements: {
             rootBox: "mx-auto",
-            card: "bg-black/80 backdrop-blur-xl border border-foreground/10 shadow-2xl",
-            headerTitle: "text-foreground",
-            headerSubtitle: "text-foreground/60",
+            card: "bg-[#0f0f0f] border border-white/10 shadow-2xl",
+            headerTitle: "text-white",
+            headerSubtitle: "text-white/60",
             socialButtonsBlockButton:
-              "border-foreground/10 bg-foreground/5 text-foreground hover:bg-foreground/10",
-            formFieldLabel: "text-foreground/70",
+              "border-white/10 bg-white/5 text-white hover:bg-white/10",
+            formFieldLabel: "text-white/70",
             formFieldInput:
-              "bg-foreground/5 border-foreground/10 text-foreground",
+              "bg-[#1a1a1a] border-white/10 text-white",
             formButtonPrimary:
-              "bg-foreground text-black hover:bg-foreground/90",
-            footerActionLink: "text-foreground/60 hover:text-foreground",
-            dividerLine: "bg-foreground/10",
-            dividerText: "text-foreground/40",
+              "bg-white text-black hover:bg-white/90",
+            footerActionLink: "text-white/60 hover:text-white",
+            dividerLine: "bg-white/10",
+            dividerText: "text-white/40",
           },
         }}
       />
