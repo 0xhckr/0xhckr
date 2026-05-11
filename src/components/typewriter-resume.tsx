@@ -206,10 +206,12 @@ export const TypewriterResume = ({ data }: TypewriterResumeProps) => {
         <div className="space-y-3">
           {Object.entries(skillsByCategory).map(([category, skills]) => (
             <div key={category}>
-              <TypewriterText
-                text={category}
-                className="text-xs sm:text-sm text-foreground/50 tracking-wider"
-              />
+              <h3>
+                <TypewriterText
+                  text={category}
+                  className="text-xs sm:text-sm text-foreground/50 tracking-wider"
+                />
+              </h3>
               <div className="mt-1">
                 {skills.map((skill) => (
                   <SkillBadge

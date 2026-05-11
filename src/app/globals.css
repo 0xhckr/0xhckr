@@ -54,15 +54,16 @@
 
 .tw-char {
   opacity: 0;
+  user-select: none;
+}
+
+h1,
+h2,
+h3 {
   text-shadow:
     0 0 2px currentColor,
     0 0 5px currentColor,
     0 0 10px currentColor;
-  user-select: none;
-}
-
-.tw-resume-section :not(h2) .tw-char {
-  text-shadow: none;
 }
 
 .tw-resume-section h2 .tw-char {
