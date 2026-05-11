@@ -10,6 +10,8 @@ export const metadata: Metadata = generatePageMetadata({
   path: "/blog",
 });
 
+export const dynamic = "force-static";
+
 export default function Blog() {
   const posts = getPostMetaList();
 
