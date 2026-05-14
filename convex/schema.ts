@@ -21,4 +21,9 @@ export default defineSchema({
     createdAt: v.number(),
     postingPostedAt: v.optional(v.number()),
   }),
+  vouches: defineTable({
+    name: v.string(),
+    url: v.string(),
+    createdAt: v.number(),
+  }),
 });

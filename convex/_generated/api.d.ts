@@ -11,6 +11,7 @@
 import type * as coverLetters from "../coverLetters.js";
 import type * as jobPostings from "../jobPostings.js";
 import type * as resumes from "../resumes.js";
+import type * as vouches from "../vouches.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +23,7 @@ declare const fullApi: ApiFromModules<{
   coverLetters: typeof coverLetters;
   jobPostings: typeof jobPostings;
   resumes: typeof resumes;
+  vouches: typeof vouches;
 }>;
 
 /**

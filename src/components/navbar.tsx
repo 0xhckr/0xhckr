@@ -15,6 +15,7 @@ const navLinks = [
   { href: "/showcase", label: "showcase" },
   { href: "/blog", label: "blog" },
   { href: "/resume", label: "resume" },
+  { href: "/vouches", label: "vouches" },
 ];
 
 export function Navbar() {
