@@ -8,6 +8,7 @@ import { Navbar } from "~/components/navbar";
 import { AdminNavbar } from "~/components/admin-navbar";
 import "./globals.css";
 import { cn } from "~/lib/utils";
+import { XoBackground } from "~/components/xo-background";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -127,10 +128,13 @@ export default function RootLayout({
           signInUrl="/sign-in"
           signUpUrl="/sign-in"
           afterSignOutUrl="/"
-          {...({ __internal_invokeMiddlewareOnAuthStateChange: false } as object)}
+          {...({
+            __internal_invokeMiddlewareOnAuthStateChange: false,
+          } as object)}
         >
           <Providers>
             <PageLoader>
+              <XoBackground />
               <Navbar />
               <AdminNavbar />
               <main>{children}</main>
