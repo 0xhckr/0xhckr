@@ -40,14 +40,54 @@ const COLORS = [
 
 const CELL_SIZE = 100;
 
+/**
+ * Multi-layer text-shadow that simulates bloom / glow.
+ * Far depth gets the heaviest, softest bloom; near gets a tighter, sharper glow.
+ */
+function getBloomShadow(color: string, depth: Depth, isMobile: boolean): string {
+  // On mobile: fewer layers for performance
+  if (isMobile) {
+    if (depth === "far") {
+      return `0 0 10px ${color}90, 0 0 30px ${color}60, 0 0 60px ${color}30`;
+    }
+    if (depth === "mid") {
+      return `0 0 8px ${color}90, 0 0 24px ${color}50`;
+    }
+    return `0 0 6px ${color}a0, 0 0 16px ${color}50`;
+  }
+  if (depth === "far") {
+    return [
+      `0 0 8px ${color}c0`,
+      `0 0 20px ${color}a0`,
+      `0 0 40px ${color}70`,
+      `0 0 80px ${color}50`,
+      `0 0 120px ${color}30`,
+    ].join(", ");
+  }
+  if (depth === "mid") {
+    return [
+      `0 0 7px ${color}c0`,
+      `0 0 18px ${color}90`,
+      `0 0 36px ${color}60`,
+      `0 0 60px ${color}30`,
+    ].join(", ");
+  }
+  // near — tight, punchy glow
+  return [
+    `0 0 6px ${color}e0`,
+    `0 0 16px ${color}a0`,
+    `0 0 30px ${color}60`,
+  ].join(", ");
+}
+
 // Extra rows generated above and below the viewport so chars are
 // available as parallax shifts the layers.
 const HEIGHT_MULT_DESKTOP = 3;
 const HEIGHT_MULT_MOBILE = 2;
 
 // Probability of placing a char in a cell.
-const FILL_RATE_DESKTOP = 0.4;
-const FILL_RATE_MOBILE = 0.25;
+const FILL_RATE_DESKTOP = 0.8;
+const FILL_RATE_MOBILE = 0.5;
 
 function getGridDimensions(width: number, height: number, heightMult: number): GridDimensions {
   return {
@@ -299,6 +339,7 @@ export function XoBackground() {
       ref={containerRef}
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
+      style={{ filter: "brightness(1.15) contrast(1.08) saturate(1.3)" }}
     >
       {/* Far parallax layer — heaviest blur, slowest scroll */}
       <div
@@ -324,7 +365,7 @@ export function XoBackground() {
                 lineHeight: 1,
                 color: c.color,
                 opacity: 0,
-                textShadow: `0 0 4px ${c.color}80`,
+                textShadow: getBloomShadow(c.color, c.depth, isMobile),
               }}
             >
               {c.char}
@@ -355,7 +396,7 @@ export function XoBackground() {
                 lineHeight: 1,
                 color: c.color,
                 opacity: 0,
-                textShadow: `0 0 4px ${c.color}80`,
+                textShadow: getBloomShadow(c.color, c.depth, isMobile),
               }}
             >
               {c.char}
@@ -386,7 +427,7 @@ export function XoBackground() {
                 lineHeight: 1,
                 color: c.color,
                 opacity: 0,
-                textShadow: `0 0 4px ${c.color}80`,
+                textShadow: getBloomShadow(c.color, c.depth, isMobile),
               }}
             >
               {c.char}
