@@ -106,7 +106,7 @@ export function XoBackground() {
   }, []);
 
   useGSAP(
-    () => {
+    (_context, contextSafe) => {
       if (chars.length === 0) return;
 
       const container = containerRef.current;
@@ -115,25 +115,63 @@ export function XoBackground() {
       const farLayer = container.querySelector(".xo-layer--far");
       const midLayer = container.querySelector(".xo-layer--mid");
       const nearLayer = container.querySelector(".xo-layer--near");
-      if (!farLayer || !midLayer || !nearLayer) return;
+      if (!farLayer || !midLayer || !nearLayer || !contextSafe) return;
 
-      // Parallax: ScrollTrigger-driven y-offset per layer
-      // Negative y so chars move UP when scrolling down
-      // Far (most blurred) = slowest, Near (crisp) = fastest
+      // --- Scroll-driven parallax (y-offset per layer) ---
+      const scrollState = { y: 0 };
       ScrollTrigger.create({
         trigger: document.documentElement,
         start: "top top",
         end: "bottom bottom",
         scrub: 0.5,
         onUpdate: (self) => {
-          const scrollY = self.scroll();
-          gsap.set(farLayer, { y: scrollY * -0.15 });
-          gsap.set(midLayer, { y: scrollY * -0.25 });
-          gsap.set(nearLayer, { y: scrollY * -0.35 });
+          scrollState.y = self.scroll();
+          updateLayers();
         },
       });
 
-      const allElements = container.querySelectorAll(".xo-char");
+      // --- Cursor-driven parallax (x + y per layer) ---
+      const cursorState = { x: 0, y: 0 };
+      const farXQ = gsap.quickTo(farLayer, "x", { duration: 0.6, ease: "power2.out" });
+      const farYQ = gsap.quickTo(farLayer, "y", { duration: 0.6, ease: "power2.out" });
+      const midXQ = gsap.quickTo(midLayer, "x", { duration: 0.5, ease: "power2.out" });
+      const midYQ = gsap.quickTo(midLayer, "y", { duration: 0.5, ease: "power2.out" });
+      const nearXQ = gsap.quickTo(nearLayer, "x", { duration: 0.4, ease: "power2.out" });
+      const nearYQ = gsap.quickTo(nearLayer, "y", { duration: 0.4, ease: "power2.out" });
+
+      // Max pixel shift from center for each layer
+      const CURSOR_RANGE = { far: -15, mid: -30, near: -50 };
+
+      function updateLayers() {
+        const sy = scrollState.y;
+        const cx = cursorState.x;
+        const cy = cursorState.y;
+        farXQ(cx * CURSOR_RANGE.far);
+        farYQ(sy * -0.15 + cy * CURSOR_RANGE.far);
+        midXQ(cx * CURSOR_RANGE.mid);
+        midYQ(sy * -0.25 + cy * CURSOR_RANGE.mid);
+        nearXQ(cx * CURSOR_RANGE.near);
+        nearYQ(sy * -0.35 + cy * CURSOR_RANGE.near);
+      }
+
+      const onMouseMove = contextSafe((e: MouseEvent) => {
+        // Normalize cursor position to -1…1 from center of viewport
+        cursorState.x = (e.clientX / window.innerWidth - 0.5) * 2;
+        cursorState.y = (e.clientY / window.innerHeight - 0.5) * 2;
+        updateLayers();
+      });
+
+      const onMouseLeave = contextSafe(() => {
+        cursorState.x = 0;
+        cursorState.y = 0;
+        updateLayers();
+      });
+
+      window.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseleave", onMouseLeave);
+
+      // --- Per-char animations ---
+      const allElements = container!.querySelectorAll(".xo-char");
       if (allElements.length === 0) return;
 
       // Only flash to invisible on initial mount, not on resize updates
@@ -191,8 +229,18 @@ export function XoBackground() {
           ease: "power2.inOut",
         });
       });
+
+      // Cleanup DOM listeners (GSAP context revert handles tweens/ScrollTriggers)
+      return () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseleave", onMouseLeave);
+      };
     },
-    { scope: containerRef, dependencies: [chars], revertOnUpdate: true },
+    {
+      scope: containerRef,
+      dependencies: [chars],
+      revertOnUpdate: true,
+    },
   );
 
   return (
