@@ -7,6 +7,11 @@ import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP);
 
+interface GridDimensions {
+  cols: number;
+  rows: number;
+}
+
 interface XoChar {
   id: number;
   char: "x" | "o" | "+";
@@ -33,9 +38,15 @@ const COLORS = [
 
 const CELL_SIZE = 100;
 
+function getGridDimensions(width: number, height: number): GridDimensions {
+  return {
+    cols: Math.ceil(width / CELL_SIZE),
+    rows: Math.ceil(height / CELL_SIZE),
+  };
+}
+
 function generateChars(width: number, height: number): XoChar[] {
-  const cols = Math.ceil(width / CELL_SIZE);
-  const rows = Math.ceil(height / CELL_SIZE);
+  const { cols, rows } = getGridDimensions(width, height);
   const chars: XoChar[] = [];
 
   for (let row = 0; row < rows; row++) {
@@ -63,10 +74,21 @@ function generateChars(width: number, height: number): XoChar[] {
 export function XoBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [chars, setChars] = useState<XoChar[]>([]);
+  const gridDimsRef = useRef<GridDimensions | null>(null);
+  const isInitialRef = useRef(true);
 
   useEffect(() => {
     const onResize = () => {
-      setChars(generateChars(window.innerWidth, window.innerHeight));
+      const newDims = getGridDimensions(window.innerWidth, window.innerHeight);
+      // Only regenerate if grid dimensions actually changed (or first run)
+      if (
+        !gridDimsRef.current ||
+        gridDimsRef.current.cols !== newDims.cols ||
+        gridDimsRef.current.rows !== newDims.rows
+      ) {
+        gridDimsRef.current = newDims;
+        setChars(generateChars(window.innerWidth, window.innerHeight));
+      }
     };
     onResize();
     window.addEventListener("resize", onResize);
@@ -80,7 +102,11 @@ export function XoBackground() {
       const elements = containerRef.current?.querySelectorAll(".xo-char");
       if (!elements || elements.length === 0) return;
 
-      gsap.set(elements, { opacity: 0, rotation: (i) => parseFloat(elements[i].getAttribute("data-rotation") || "0") });
+      // Only flash to invisible on initial mount, not on resize updates
+      if (isInitialRef.current) {
+        gsap.set(elements, { opacity: 0, rotation: (i) => parseFloat(elements[i].getAttribute("data-rotation") || "0") });
+        isInitialRef.current = false;
+      }
 
       // Each char gets its own looping tween with random timing
       elements.forEach((el) => {
@@ -102,7 +128,8 @@ export function XoBackground() {
           y: vy * 60,
           duration: 60,
           repeat: -1,
-          ease: "none",
+          yoyo: true,
+          ease: "sine.inOut",
         });
 
         // Continuous slow rotation
@@ -145,6 +172,7 @@ export function XoBackground() {
             fontSize: `${c.size}px`,
             lineHeight: 1,
             color: c.color,
+            opacity: 0,
             textShadow: `0 0 4px ${c.color}80`,
           }}
         >
