@@ -4,7 +4,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -43,23 +42,29 @@ const CELL_SIZE = 100;
 
 // Extra rows generated above and below the viewport so chars are
 // available as parallax shifts the layers.
-const HEIGHT_MULT = 3;
+const HEIGHT_MULT_DESKTOP = 3;
+const HEIGHT_MULT_MOBILE = 2;
 
-function getGridDimensions(width: number, height: number): GridDimensions {
+// Probability of placing a char in a cell.
+const FILL_RATE_DESKTOP = 0.4;
+const FILL_RATE_MOBILE = 0.25;
+
+function getGridDimensions(width: number, height: number, heightMult: number): GridDimensions {
   return {
     cols: Math.ceil(width / CELL_SIZE),
-    rows: Math.ceil((height * HEIGHT_MULT) / CELL_SIZE),
+    rows: Math.ceil((height * heightMult) / CELL_SIZE),
   };
 }
 
-function generateChars(width: number, height: number): XoChar[] {
-  const totalHeight = height * HEIGHT_MULT;
-  const { cols, rows } = getGridDimensions(width, height);
+function generateChars(width: number, height: number, isMobile: boolean): XoChar[] {
+  const heightMult = isMobile ? HEIGHT_MULT_MOBILE : HEIGHT_MULT_DESKTOP;
+  const fillRate = isMobile ? FILL_RATE_MOBILE : FILL_RATE_DESKTOP;
+  const { cols, rows } = getGridDimensions(width, height, heightMult);
   const chars: XoChar[] = [];
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      if (Math.random() > 0.4) continue;
+      if (Math.random() > fillRate) continue;
 
       chars.push({
         id: row * cols + col,
@@ -79,17 +84,32 @@ function generateChars(width: number, height: number): XoChar[] {
   return chars;
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
+
 export function XoBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [chars, setChars] = useState<XoChar[]>([]);
   const gridDimsRef = useRef<GridDimensions | null>(null);
   const isInitialRef = useRef(true);
   const viewportRef = useRef({ width: 0, height: 0 });
+  const isMobile = useIsMobile();
+
+  const heightMult = isMobile ? HEIGHT_MULT_MOBILE : HEIGHT_MULT_DESKTOP;
 
   useEffect(() => {
     const onResize = () => {
       viewportRef.current = { width: window.innerWidth, height: window.innerHeight };
-      const newDims = getGridDimensions(window.innerWidth, window.innerHeight);
+      const newDims = getGridDimensions(window.innerWidth, window.innerHeight, heightMult);
       // Only regenerate if grid dimensions actually changed (or first run)
       if (
         !gridDimsRef.current ||
@@ -97,13 +117,14 @@ export function XoBackground() {
         gridDimsRef.current.rows !== newDims.rows
       ) {
         gridDimsRef.current = newDims;
-        setChars(generateChars(window.innerWidth, window.innerHeight));
+        isInitialRef.current = true;
+        setChars(generateChars(window.innerWidth, window.innerHeight, isMobile));
       }
     };
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, []);
+  }, [isMobile, heightMult]);
 
   useGSAP(
     (_context, contextSafe) => {
@@ -119,6 +140,40 @@ export function XoBackground() {
 
       // --- Scroll-driven parallax (y-offset per layer) ---
       const scrollState = { y: 0 };
+
+      // --- Cursor-driven parallax (desktop only) ---
+      const cursorState = { x: 0, y: 0 };
+      let removeCursorListeners: (() => void) | null = null;
+
+      // Desktop: quickTo for smooth scroll + cursor combined parallax
+      // Mobile: direct gsap.set for scroll-only parallax (no cursor, less GPU)
+      const farXQ = isMobile ? null : gsap.quickTo(farLayer, "x", { duration: 0.6, ease: "power2.out" });
+      const farYQ = isMobile ? null : gsap.quickTo(farLayer, "y", { duration: 0.6, ease: "power2.out" });
+      const midXQ = isMobile ? null : gsap.quickTo(midLayer, "x", { duration: 0.5, ease: "power2.out" });
+      const midYQ = isMobile ? null : gsap.quickTo(midLayer, "y", { duration: 0.5, ease: "power2.out" });
+      const nearXQ = isMobile ? null : gsap.quickTo(nearLayer, "x", { duration: 0.4, ease: "power2.out" });
+      const nearYQ = isMobile ? null : gsap.quickTo(nearLayer, "y", { duration: 0.4, ease: "power2.out" });
+
+      const CURSOR_RANGE = { far: -15, mid: -30, near: -50 };
+
+      function updateLayers() {
+        const sy = scrollState.y;
+        const cx = cursorState.x;
+        const cy = cursorState.y;
+        if (isMobile) {
+          gsap.set(farLayer, { y: sy * -0.15 });
+          gsap.set(midLayer, { y: sy * -0.25 });
+          gsap.set(nearLayer, { y: sy * -0.35 });
+        } else {
+          farXQ!(cx * CURSOR_RANGE.far);
+          farYQ!(sy * -0.15 + cy * CURSOR_RANGE.far);
+          midXQ!(cx * CURSOR_RANGE.mid);
+          midYQ!(sy * -0.25 + cy * CURSOR_RANGE.mid);
+          nearXQ!(cx * CURSOR_RANGE.near);
+          nearYQ!(sy * -0.35 + cy * CURSOR_RANGE.near);
+        }
+      }
+
       ScrollTrigger.create({
         trigger: document.documentElement,
         start: "top top",
@@ -130,45 +185,26 @@ export function XoBackground() {
         },
       });
 
-      // --- Cursor-driven parallax (x + y per layer) ---
-      const cursorState = { x: 0, y: 0 };
-      const farXQ = gsap.quickTo(farLayer, "x", { duration: 0.6, ease: "power2.out" });
-      const farYQ = gsap.quickTo(farLayer, "y", { duration: 0.6, ease: "power2.out" });
-      const midXQ = gsap.quickTo(midLayer, "x", { duration: 0.5, ease: "power2.out" });
-      const midYQ = gsap.quickTo(midLayer, "y", { duration: 0.5, ease: "power2.out" });
-      const nearXQ = gsap.quickTo(nearLayer, "x", { duration: 0.4, ease: "power2.out" });
-      const nearYQ = gsap.quickTo(nearLayer, "y", { duration: 0.4, ease: "power2.out" });
+      if (!isMobile) {
+        const onMouseMove = contextSafe((e: MouseEvent) => {
+          cursorState.x = (e.clientX / window.innerWidth - 0.5) * 2;
+          cursorState.y = (e.clientY / window.innerHeight - 0.5) * 2;
+          updateLayers();
+        });
 
-      // Max pixel shift from center for each layer
-      const CURSOR_RANGE = { far: -15, mid: -30, near: -50 };
+        const onMouseLeave = contextSafe(() => {
+          cursorState.x = 0;
+          cursorState.y = 0;
+          updateLayers();
+        });
 
-      function updateLayers() {
-        const sy = scrollState.y;
-        const cx = cursorState.x;
-        const cy = cursorState.y;
-        farXQ(cx * CURSOR_RANGE.far);
-        farYQ(sy * -0.15 + cy * CURSOR_RANGE.far);
-        midXQ(cx * CURSOR_RANGE.mid);
-        midYQ(sy * -0.25 + cy * CURSOR_RANGE.mid);
-        nearXQ(cx * CURSOR_RANGE.near);
-        nearYQ(sy * -0.35 + cy * CURSOR_RANGE.near);
+        window.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseleave", onMouseLeave);
+        removeCursorListeners = () => {
+          window.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseleave", onMouseLeave);
+        };
       }
-
-      const onMouseMove = contextSafe((e: MouseEvent) => {
-        // Normalize cursor position to -1…1 from center of viewport
-        cursorState.x = (e.clientX / window.innerWidth - 0.5) * 2;
-        cursorState.y = (e.clientY / window.innerHeight - 0.5) * 2;
-        updateLayers();
-      });
-
-      const onMouseLeave = contextSafe(() => {
-        cursorState.x = 0;
-        cursorState.y = 0;
-        updateLayers();
-      });
-
-      window.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseleave", onMouseLeave);
 
       // --- Per-char animations ---
       const allElements = container!.querySelectorAll(".xo-char");
@@ -185,55 +221,70 @@ export function XoBackground() {
       }
 
       // Each char gets its own looping tween with random timing
+      // On mobile: only opacity animation, no drift/rotation to reduce GPU load
       allElements.forEach((el) => {
         const baseRotation = parseFloat(
           el.getAttribute("data-rotation") || "0",
       );
-        const fadeInDuration = gsap.utils.random(1.5, 3);
-        const holdDuration = gsap.utils.random(1, 3);
-        const pauseDuration = gsap.utils.random(2, 5);
         const maxOpacity = gsap.utils.random(0.1, 0.75);
         const startDelay = gsap.utils.random(0, 6);
-        const rotationSpeed = gsap.utils.random(5, 20);
-        const angle = gsap.utils.random(0, Math.PI * 2);
-        const speed = gsap.utils.random(3, 8);
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
 
-        // Continuous slow drift
-        gsap.to(el, {
-          x: vx * 60,
-          y: vy * 60,
-          duration: 60,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
+        if (!isMobile) {
+          const fadeInDuration = gsap.utils.random(1.5, 3);
+          const holdDuration = gsap.utils.random(1, 3);
+          const pauseDuration = gsap.utils.random(2, 5);
+          const rotationSpeed = gsap.utils.random(5, 20);
+          const angle = gsap.utils.random(0, Math.PI * 2);
+          const speed = gsap.utils.random(3, 8);
+          const vx = Math.cos(angle) * speed;
+          const vy = Math.sin(angle) * speed;
 
-        // Continuous slow rotation
-        gsap.to(el, {
-          rotation: baseRotation + 360 * Math.sign(rotationSpeed),
-          duration: 360 / Math.abs(rotationSpeed),
-          repeat: -1,
-          ease: "none",
-        });
+          // Continuous slow drift
+          gsap.to(el, {
+            x: vx * 60,
+            y: vy * 60,
+            duration: 60,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          });
 
-        // Fade in/out
-        gsap.to(el, {
-          opacity: maxOpacity,
-          duration: fadeInDuration,
-          delay: startDelay,
-          repeat: -1,
-          yoyo: true,
-          repeatDelay: holdDuration + pauseDuration,
-          ease: "power2.inOut",
-        });
+          // Continuous slow rotation
+          gsap.to(el, {
+            rotation: baseRotation + 360 * Math.sign(rotationSpeed),
+            duration: 360 / Math.abs(rotationSpeed),
+            repeat: -1,
+            ease: "none",
+          });
+
+          // Fade in/out
+          gsap.to(el, {
+            opacity: maxOpacity,
+            duration: fadeInDuration,
+            delay: startDelay,
+            repeat: -1,
+            yoyo: true,
+            repeatDelay: holdDuration + pauseDuration,
+            ease: "power2.inOut",
+          });
+        } else {
+          // Mobile: only a simple fade pulse — no transforms
+          const fadeDuration = gsap.utils.random(3, 6);
+          gsap.to(el, {
+            opacity: maxOpacity,
+            duration: fadeDuration,
+            delay: startDelay,
+            repeat: -1,
+            yoyo: true,
+            repeatDelay: gsap.utils.random(3, 6),
+            ease: "power2.inOut",
+          });
+        }
       });
 
       // Cleanup DOM listeners (GSAP context revert handles tweens/ScrollTriggers)
       return () => {
-        window.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseleave", onMouseLeave);
+        removeCursorListeners?.();
       };
     },
     {
@@ -256,7 +307,7 @@ export function XoBackground() {
           top: -viewportRef.current.height,
           left: 0,
           width: viewportRef.current.width,
-          height: viewportRef.current.height * HEIGHT_MULT,
+          height: viewportRef.current.height * heightMult,
         }}
       >
         {chars
@@ -264,7 +315,7 @@ export function XoBackground() {
           .map((c) => (
             <span
               key={c.id}
-              className="xo-char absolute font-mono blur-lg"
+              className={"xo-char absolute font-mono" + (isMobile ? "" : " blur-lg")}
               data-rotation={c.rotation}
               style={{
                 left: `${c.x}px`,
@@ -287,7 +338,7 @@ export function XoBackground() {
           top: -viewportRef.current.height,
           left: 0,
           width: viewportRef.current.width,
-          height: viewportRef.current.height * HEIGHT_MULT,
+          height: viewportRef.current.height * heightMult,
         }}
       >
         {chars
@@ -295,7 +346,7 @@ export function XoBackground() {
           .map((c) => (
             <span
               key={c.id}
-              className="xo-char absolute font-mono blur-sm"
+              className={"xo-char absolute font-mono" + (isMobile ? "" : " blur-sm")}
               data-rotation={c.rotation}
               style={{
                 left: `${c.x}px`,
@@ -318,7 +369,7 @@ export function XoBackground() {
           top: -viewportRef.current.height,
           left: 0,
           width: viewportRef.current.width,
-          height: viewportRef.current.height * HEIGHT_MULT,
+          height: viewportRef.current.height * heightMult,
         }}
       >
         {chars
