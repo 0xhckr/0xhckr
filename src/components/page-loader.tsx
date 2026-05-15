@@ -1,7 +1,9 @@
 "use client";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP);
@@ -9,6 +11,21 @@ gsap.registerPlugin(useGSAP);
 export const PageLoader = ({ children }: { children: React.ReactNode }) => {
   const [squares, setSquares] = useState<React.ReactNode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Pre-load data during the loader animation
+  const resumeData = useQuery(api.resumes.getFrontFacing);
+  const vouchesData = useQuery(api.vouches.list);
+  const dataReadyRef = useRef(
+    resumeData !== undefined && vouchesData !== undefined,
+  );
+  dataReadyRef.current =
+    resumeData !== undefined && vouchesData !== undefined;
+
+  const dismissRef = useRef<() => void>(() => {});
+  dismissRef.current = () => {
+    setIsLoading(false);
+    window.dispatchEvent(new CustomEvent("page-ready"));
+  };
   useEffect(() => {
     setSquares(
       Array.from({
@@ -99,8 +116,16 @@ export const PageLoader = ({ children }: { children: React.ReactNode }) => {
       },
       delay: 0.5,
       onComplete: () => {
-        setIsLoading(false);
-        window.dispatchEvent(new CustomEvent("page-ready"));
+        if (dataReadyRef.current) {
+          dismissRef.current?.();
+        } else {
+          const interval = setInterval(() => {
+            if (dataReadyRef.current) {
+              clearInterval(interval);
+              dismissRef.current?.();
+            }
+          }, 50);
+        }
       },
     });
   }, [squares]);
