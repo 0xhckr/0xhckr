@@ -68,7 +68,7 @@ export default function AdminVouchesPage() {
         </div>
 
         {/* Add form */}
-        <div className="w-full max-w-2xl mb-8 space-y-3 rounded-md border border-border/50 p-4">
+        <div className="w-full max-w-2xl mb-8 space-y-3 p-4">
           <p className="text-sm text-muted-foreground lowercase">Add a vouch</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Input
@@ -115,7 +115,7 @@ export default function AdminVouchesPage() {
               return (
                 <div
                   key={vouch._id}
-                  className="flex items-center justify-between rounded-md border border-border/50 p-4"
+                  className="flex items-center justify-between p-4"
                 >
                   {isEditing ? (
                     <div className="flex flex-1 flex-col gap-2 sm:flex-row">
