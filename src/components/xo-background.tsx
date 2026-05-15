@@ -104,17 +104,23 @@ export function XoBackground() {
 
       // Only flash to invisible on initial mount, not on resize updates
       if (isInitialRef.current) {
-        gsap.set(elements, { opacity: 0, rotation: (i) => parseFloat(elements[i].getAttribute("data-rotation") || "0") });
+        gsap.set(elements, {
+          opacity: 0,
+          rotation: (i) =>
+            parseFloat(elements[i].getAttribute("data-rotation") || "0"),
+        });
         isInitialRef.current = false;
       }
 
       // Each char gets its own looping tween with random timing
       elements.forEach((el) => {
-        const baseRotation = parseFloat(el.getAttribute("data-rotation") || "0");
+        const baseRotation = parseFloat(
+          el.getAttribute("data-rotation") || "0",
+        );
         const fadeInDuration = gsap.utils.random(1.5, 3);
         const holdDuration = gsap.utils.random(1, 3);
         const pauseDuration = gsap.utils.random(2, 5);
-        const maxOpacity = gsap.utils.random(0.3, 0.75);
+        const maxOpacity = gsap.utils.random(0.1, 0.75);
         const startDelay = gsap.utils.random(0, 6);
         const rotationSpeed = gsap.utils.random(5, 20);
         const angle = gsap.utils.random(0, Math.PI * 2);
