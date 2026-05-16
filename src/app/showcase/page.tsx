@@ -22,9 +22,9 @@ const projects = [
     link: "https://thenix.guide",
   },
   {
-    title: "0xhckr.dev",
-    description: "my personal portfolio site.",
-    link: "https://0xhckr.dev",
+    title: "tngl2github",
+    description: "a quaint little mirror from tangled repositories to github.",
+    link: "https://tangled.org/0xhckr.dev/tngl2github",
   },
 ];
 
