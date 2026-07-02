@@ -18,6 +18,6 @@ Servers &nbsp;&nbsp; • &nbsp;&nbsp; Security &nbsp;&nbsp; • &nbsp;&nbsp; Dev
 
 ## Currently Working On
 
-[thenix.guide](https://thenix.guide) &nbsp;&nbsp; • &nbsp;&nbsp; [stoa.gg](https://stoa.gg) &nbsp;&nbsp; • &nbsp;&nbsp; [rocky.systems](https://rocky.systems)
+[thenix.guide](https://thenix.guide) &nbsp;&nbsp; • &nbsp;&nbsp; [rocky.systems](https://rocky.systems)
 
 </div>
