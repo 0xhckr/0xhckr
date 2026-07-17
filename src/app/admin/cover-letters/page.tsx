@@ -3,7 +3,14 @@
 import { useMutation, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import {
+  AdminPageHeader,
+  AdminShell,
+  EmptyState,
+  Pill,
+} from "~/components/admin/ui";
 import { DownloadCoverLetterButton } from "~/components/download-cover-letter-button";
+import { Reveal } from "~/components/reveal";
 import { Button } from "~/components/ui/button";
 import { api } from "../../../../convex/_generated/api";
 
@@ -18,104 +25,91 @@ export default function AdminCoverLettersPage() {
   };
 
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col items-center px-4 pt-admin-navbar py-16 sm:px-8">
-        <div className="flex items-center justify-between w-full max-w-2xl mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight lowercase">
-            Manage Cover Letters
-          </h1>
-          <Button
-            onClick={handleCreate}
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Create cover letter"
-          >
-            <Plus className="size-4" />
-          </Button>
+    <AdminShell>
+      <AdminPageHeader eyebrow="admin / cover letters" title="Cover letters">
+        <Button onClick={handleCreate} variant="outline" size="sm">
+          <Plus className="size-3.5" />
+          new
+        </Button>
+      </AdminPageHeader>
+
+      {coverLetters === undefined && (
+        <p className="mt-12 font-mono text-xs text-muted-foreground lowercase">
+          loading...
+        </p>
+      )}
+
+      {coverLetters === null && (
+        <div className="mt-12">
+          <EmptyState>sign in to manage cover letters.</EmptyState>
         </div>
+      )}
 
-        {coverLetters === undefined && (
-          <p className="text-muted-foreground lowercase">Loading...</p>
-        )}
+      {coverLetters && coverLetters.length === 0 && (
+        <div className="mt-12">
+          <EmptyState>
+            no cover letters yet — create one to get started.
+          </EmptyState>
+        </div>
+      )}
 
-        {coverLetters === null && (
-          <p className="text-muted-foreground lowercase">
-            Sign in to manage cover letters.
-          </p>
-        )}
+      {coverLetters && coverLetters.length > 0 && (
+        <Reveal className="mt-8">
+          {coverLetters.map((coverLetter, i) => {
+            const jp = coverLetter.jobPosting
+              ? jobPostings?.find((j) => j._id === coverLetter.jobPosting)
+              : undefined;
 
-        {coverLetters && coverLetters.length === 0 && (
-          <p className="text-muted-foreground lowercase">
-            No cover letters found.
-          </p>
-        )}
-
-        {coverLetters && coverLetters.length > 0 && (
-          <div className="w-full max-w-2xl space-y-4">
-            {coverLetters.map((coverLetter) => (
+            return (
               <div
                 key={coverLetter._id}
-                className="relative p-4 hover:bg-foreground/5"
+                className="reveal-item row-hover group relative border-t hairline py-6 last:border-b"
               >
                 <Link
                   href={`/admin/cover-letters/${coverLetter._id}`}
                   className="absolute inset-0"
+                  aria-label={`Edit cover letter from ${new Date(coverLetter.createdAt).toLocaleDateString()}`}
                 />
-                <div className="flex items-center justify-between relative">
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(coverLetter.createdAt).toLocaleDateString(
-                      undefined,
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
-                    )}
+                <div className="relative flex items-baseline gap-5">
+                  <span className="font-mono text-xs text-muted-foreground/60">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <div className="flex items-center gap-2">
-                    {coverLetter.content && (
-                      <DownloadCoverLetterButton
-                        content={coverLetter.content}
-                        jobTitle={
-                          coverLetter.jobPosting
-                            ? jobPostings?.find(
-                                (j) => j._id === coverLetter.jobPosting,
-                              )?.title
-                            : undefined
-                        }
-                        company={
-                          coverLetter.jobPosting
-                            ? jobPostings?.find(
-                                (j) => j._id === coverLetter.jobPosting,
-                              )?.company
-                            : undefined
-                        }
-                      />
-                    )}
-                    {coverLetter.jobPosting && (
-                      <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-500">
-                        {(() => {
-                          const jp = jobPostings?.find(
-                            (j) => j._id === coverLetter.jobPosting,
-                          );
-                          return jp
-                            ? `${jp.title}${jp.company ? ` @ ${jp.company}` : ""}`
-                            : "Unknown";
-                        })()}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                        {new Date(coverLetter.createdAt).toLocaleDateString(
+                          "en-CA",
+                          { year: "numeric", month: "short", day: "2-digit" },
+                        )}
                       </span>
+                      {jp && (
+                        <Pill tone="muted">
+                          {jp.title}
+                          {jp.company ? ` @ ${jp.company}` : ""}
+                        </Pill>
+                      )}
+                    </div>
+                    {coverLetter.content && (
+                      <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                        {coverLetter.content}
+                      </p>
                     )}
                   </div>
+                  {coverLetter.content && (
+                    <span className="relative shrink-0">
+                      <DownloadCoverLetterButton
+                        content={coverLetter.content}
+                        jobTitle={jp?.title}
+                        company={jp?.company}
+                      />
+                    </span>
+                  )}
                 </div>
-                {coverLetter.content && (
-                  <p className="mt-2 text-sm line-clamp-3">
-                    {coverLetter.content}
-                  </p>
-                )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+            );
+          })}
+        </Reveal>
+      )}
+    </AdminShell>
   );
 }

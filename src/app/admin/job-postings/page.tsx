@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import { AdminPageHeader, AdminShell, EmptyState } from "~/components/admin/ui";
+import { Reveal } from "~/components/reveal";
 import { Button } from "~/components/ui/button";
 import { api } from "../../../../convex/_generated/api";
 
@@ -20,72 +22,72 @@ export default function AdminJobPostingsPage() {
   };
 
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col items-center px-4 pt-admin-navbar py-16 sm:px-8">
-        <div className="flex items-center justify-between w-full max-w-2xl mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight lowercase">
-            Manage Job Postings
-          </h1>
-          <Button
-            onClick={handleCreate}
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Create job posting"
-          >
-            <Plus className="size-4" />
-          </Button>
+    <AdminShell>
+      <AdminPageHeader eyebrow="admin / job postings" title="Job postings">
+        <Button onClick={handleCreate} variant="outline" size="sm">
+          <Plus className="size-3.5" />
+          new
+        </Button>
+      </AdminPageHeader>
+
+      {jobPostings === undefined && (
+        <p className="mt-12 font-mono text-xs text-muted-foreground lowercase">
+          loading...
+        </p>
+      )}
+
+      {jobPostings === null && (
+        <div className="mt-12">
+          <EmptyState>sign in to manage job postings.</EmptyState>
         </div>
+      )}
 
-        {jobPostings === undefined && (
-          <p className="text-muted-foreground lowercase">Loading...</p>
-        )}
+      {jobPostings && jobPostings.length === 0 && (
+        <div className="mt-12">
+          <EmptyState>
+            no job postings yet — create one to get started.
+          </EmptyState>
+        </div>
+      )}
 
-        {jobPostings === null && (
-          <p className="text-muted-foreground lowercase">
-            Sign in to manage job postings.
-          </p>
-        )}
-
-        {jobPostings && jobPostings.length === 0 && (
-          <p className="text-muted-foreground lowercase">
-            No job postings found. Create one to get started.
-          </p>
-        )}
-
-        {jobPostings && jobPostings.length > 0 && (
-          <div className="w-full max-w-2xl space-y-4">
-            {jobPostings.map((posting) => (
-              <Link
-                key={posting._id}
-                href={`/admin/job-postings/${posting._id}`}
-                className="block p-4 hover:bg-foreground/5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {posting.company}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {new Date(posting.createdAt).toLocaleDateString(
-                      undefined,
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      },
+      {jobPostings && jobPostings.length > 0 && (
+        <Reveal className="mt-8">
+          {jobPostings.map((posting, i) => (
+            <Link
+              key={posting._id}
+              href={`/admin/job-postings/${posting._id}`}
+              className="reveal-item row-hover group block border-t hairline py-6 last:border-b"
+            >
+              <div className="flex items-baseline gap-5">
+                <span className="font-mono text-xs text-muted-foreground/60">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-sans text-lg font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent">
+                    {posting.title || "untitled"}
+                    {posting.company && (
+                      <span className="text-muted-foreground">
+                        <span className="text-accent"> @ </span>
+                        {posting.company}
+                      </span>
                     )}
-                  </span>
+                  </h2>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
+                    <span className="tabular-nums">
+                      {new Date(posting.createdAt).toLocaleDateString("en-CA", {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                      })}
+                    </span>
+                    {posting.location && <span>{posting.location}</span>}
+                  </div>
                 </div>
-                <p className="mt-2 text-sm font-medium">{posting.title || "Untitled"}</p>
-                {posting.location && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {posting.location}
-                  </p>
-                )}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+              </div>
+            </Link>
+          ))}
+        </Reveal>
+      )}
+    </AdminShell>
   );
 }

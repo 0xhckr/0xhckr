@@ -2,17 +2,17 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import { Providers } from "~/components/providers";
-import { PageLoader } from "~/components/page-loader";
-import { Navbar } from "~/components/navbar";
 import { AdminNavbar } from "~/components/admin-navbar";
+import { Navbar } from "~/components/navbar";
+import { PageLoader } from "~/components/page-loader";
+import { Providers } from "~/components/providers";
 import "./globals.css";
+import { AmbientBackground } from "~/components/ambient-background";
 import { cn } from "~/lib/utils";
-import { XoBackground } from "~/components/xo-background";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-jetbrains",
 });
 
 const dmSans = DM_Sans({
@@ -86,11 +86,10 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       className={cn(
-        "font-mono",
+        "dark",
         dmSans.variable,
         departureMono.variable,
         jetbrainsMono.variable,
-        "dark",
       )}
     >
       <head>
@@ -134,10 +133,10 @@ export default function RootLayout({
         >
           <Providers>
             <PageLoader>
-              <XoBackground />
+              <AmbientBackground />
               <Navbar />
               <AdminNavbar />
-              <main>{children}</main>
+              <main className="relative z-10">{children}</main>
             </PageLoader>
           </Providers>
         </ClerkProvider>

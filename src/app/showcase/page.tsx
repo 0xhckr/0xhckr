@@ -1,6 +1,7 @@
+import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import { PageHeading } from "~/components/page-heading";
-import { TypewriterProjects } from "~/components/typewriter-projects";
+import { PageHeader } from "~/components/page-header";
+import { Reveal } from "~/components/reveal";
 import { generatePageMetadata } from "~/lib/metadata";
 
 export const metadata: Metadata = generatePageMetadata({
@@ -31,11 +32,40 @@ const projects = [
 export default function Showcase() {
   return (
     <main id="main-content" tabIndex={-1}>
-      <div className="flex min-h-screen flex-col items-center px-4 sm:px-8">
-        <div className="tw-content my-auto w-full max-w-2xl lowercase pb-navbar pt-admin-navbar">
-          <PageHeading text="Showcase" inline />
-          <TypewriterProjects projects={projects} />
-        </div>
+      <div className="mx-auto max-w-5xl px-5 pt-36 pb-24 sm:px-8 sm:pt-44">
+        <PageHeader
+          eyebrow="showcase"
+          title="Selected work"
+          description="A collection of projects I've built — from communications platforms to developer tools."
+        />
+
+        <Reveal className="mt-16 sm:mt-20">
+          {projects.map((project, i) => (
+            <a
+              key={project.title}
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="reveal-item row-hover group block border-t hairline py-8 sm:py-10"
+            >
+              <div className="flex items-baseline gap-5 sm:gap-8">
+                <span className="font-mono text-xs text-muted-foreground/60">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h2 className="glitch-hover font-sans text-2xl font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent sm:text-4xl">
+                    {project.title}
+                    <ArrowUpRight className="mb-0.5 ml-2.5 inline-block size-5 text-muted-foreground/50 transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-accent sm:ml-3.5 sm:size-7" />
+                  </h2>
+                  <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+                    {project.description}
+                  </p>
+                </div>
+              </div>
+            </a>
+          ))}
+          <div className="reveal-item border-t hairline" />
+        </Reveal>
       </div>
     </main>
   );

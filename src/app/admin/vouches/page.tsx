@@ -3,6 +3,13 @@
 import { useMutation, useQuery } from "convex/react";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import {
+  AdminPageHeader,
+  AdminSection,
+  AdminShell,
+  EmptyState,
+} from "~/components/admin/ui";
+import { Reveal } from "~/components/reveal";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { api } from "../../../../convex/_generated/api";
@@ -59,63 +66,56 @@ export default function AdminVouchesPage() {
   };
 
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col items-center px-4 pt-admin-navbar py-16 sm:px-8">
-        <div className="flex items-center justify-between w-full max-w-2xl mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight lowercase">
-            Manage Vouches
-          </h1>
-        </div>
+    <AdminShell>
+      <AdminPageHeader eyebrow="admin / vouches" title="Vouches" />
 
-        {/* Add form */}
-        <div className="w-full max-w-2xl mb-8 space-y-3 rounded-md border border-border/50 p-4">
-          <p className="text-sm text-muted-foreground lowercase">Add a vouch</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <Input
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCreate();
-              }}
-            />
-            <Button
-              onClick={handleCreate}
-              variant="outline"
-              size="icon"
-              aria-label="Add vouch"
-              disabled={!name.trim() || !url.trim()}
-            >
-              <Plus className="size-4" />
-            </Button>
-          </div>
+      <AdminSection index="01" title="add a vouch">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleCreate();
+            }}
+          />
+          <Button
+            onClick={handleCreate}
+            variant="outline"
+            size="icon"
+            aria-label="Add vouch"
+            disabled={!name.trim() || !url.trim()}
+          >
+            <Plus className="size-4" />
+          </Button>
         </div>
+      </AdminSection>
 
-        {/* List */}
+      <AdminSection index="02" title="all vouches">
         {vouches === undefined && (
-          <p className="text-muted-foreground lowercase">Loading...</p>
-        )}
-
-        {vouches && vouches.length === 0 && (
-          <p className="text-muted-foreground lowercase">
-            No vouches found. Add one above to get started.
+          <p className="font-mono text-xs text-muted-foreground lowercase">
+            loading...
           </p>
         )}
 
+        {vouches && vouches.length === 0 && (
+          <EmptyState>no vouches yet — add one above.</EmptyState>
+        )}
+
         {vouches && vouches.length > 0 && (
-          <div className="w-full max-w-2xl space-y-2">
-            {vouches.map((vouch) => {
+          <Reveal>
+            {vouches.map((vouch, i) => {
               const isEditing = editingId === vouch._id;
 
               return (
                 <div
                   key={vouch._id}
-                  className="flex items-center justify-between rounded-md border border-border/50 p-4"
+                  className="reveal-item border-t hairline py-4 last:border-b"
                 >
                   {isEditing ? (
                     <div className="flex flex-1 flex-col gap-2 sm:flex-row">
@@ -160,21 +160,24 @@ export default function AdminVouchesPage() {
                       </div>
                     </div>
                   ) : (
-                    <>
+                    <div className="flex items-center gap-5">
+                      <span className="font-mono text-xs text-muted-foreground/60">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">
+                        <p className="truncate font-sans text-sm font-medium text-foreground">
                           {vouch.name}
                         </p>
                         <a
                           href={vouch.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-muted-foreground hover:underline truncate block"
+                          className="block truncate font-mono text-xs text-muted-foreground transition-colors hover:text-accent"
                         >
                           {vouch.url}
                         </a>
                       </div>
-                      <div className="flex gap-1 ml-2">
+                      <div className="flex gap-1">
                         <Button
                           variant="ghost"
                           size="icon-sm"
@@ -189,17 +192,17 @@ export default function AdminVouchesPage() {
                           onClick={() => handleRemove(vouch._id)}
                           aria-label={`Remove ${vouch.name}`}
                         >
-                          <Trash2 className="size-4 text-destructive" />
+                          <Trash2 className="size-4 text-destructive-foreground" />
                         </Button>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
               );
             })}
-          </div>
+          </Reveal>
         )}
-      </div>
-    </main>
+      </AdminSection>
+    </AdminShell>
   );
 }

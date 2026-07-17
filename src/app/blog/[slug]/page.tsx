@@ -1,6 +1,8 @@
-import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { marked } from "marked";
-import { PageHeading } from "~/components/page-heading";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { PageHeader } from "~/components/page-header";
 import { getAllSlugs, getPostBySlug } from "~/lib/blog";
 import { generatePageMetadata } from "~/lib/metadata";
 
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function BlogPost({ params }: PageProps) {
   const { slug } = await params;
 
-  let post;
+  let post: ReturnType<typeof getPostBySlug>;
   try {
     post = getPostBySlug(slug);
   } catch {
@@ -42,12 +44,20 @@ export default async function BlogPost({ params }: PageProps) {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <article className="mx-auto max-w-2xl px-4 pb-navbar pt-admin-navbar sm:px-8">
-        <header className="mb-8">
-          <PageHeading text={post.meta.title} inline />
+      <article className="mx-auto max-w-3xl px-5 pt-36 pb-24 sm:px-8 sm:pt-44">
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground transition-colors hover:text-accent"
+        >
+          <ArrowLeft className="size-3.5" />
+          all posts
+        </Link>
+
+        <header className="mt-10 mb-12 border-b hairline pb-12">
+          <PageHeader eyebrow="writing" title={post.meta.title} />
           <time
             dateTime={post.meta.date}
-            className="mt-2 block text-sm text-foreground/50 font-mono"
+            className="mt-6 block font-mono text-xs text-muted-foreground"
           >
             {new Date(post.meta.date).toLocaleDateString("en-CA", {
               year: "numeric",

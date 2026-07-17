@@ -1,12 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import type { ResumeData } from "~/lib/resume";
-import { DownloadResumeButton } from "~/components/download-resume-button";
-import { Button } from "~/components/ui/button";
 import { Plus } from "lucide-react";
+import Link from "next/link";
+import {
+  AdminPageHeader,
+  AdminShell,
+  EmptyState,
+  Pill,
+} from "~/components/admin/ui";
+import { DownloadResumeButton } from "~/components/download-resume-button";
+import { Reveal } from "~/components/reveal";
+import { Button } from "~/components/ui/button";
+import type { ResumeData } from "~/lib/resume";
+import { api } from "../../../../convex/_generated/api";
 
 export default function AdminResumesPage() {
   const resumes = useQuery(api.resumes.list);
@@ -14,103 +21,108 @@ export default function AdminResumesPage() {
   const createResume = useMutation(api.resumes.create);
 
   const handleCreate = async () => {
-    const id = await createResume({ content: JSON.stringify({ profile: "", experiences: [], skills: [], education: null }) });
+    const id = await createResume({
+      content: JSON.stringify({
+        profile: "",
+        experiences: [],
+        skills: [],
+        education: null,
+      }),
+    });
     window.location.href = `/admin/resumes/${id}`;
   };
 
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col items-center px-4 pt-admin-navbar py-16 sm:px-8">
-        <div className="flex items-center justify-between w-full max-w-2xl mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight lowercase">
-            Manage Resumes
-          </h1>
-          <Button
-            onClick={handleCreate}
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Create resume"
-          >
-            <Plus className="size-4" />
-          </Button>
+    <AdminShell>
+      <AdminPageHeader eyebrow="admin / resumes" title="Resumes">
+        <Button onClick={handleCreate} variant="outline" size="sm">
+          <Plus className="size-3.5" />
+          new
+        </Button>
+      </AdminPageHeader>
+
+      {resumes === undefined && (
+        <p className="mt-12 font-mono text-xs text-muted-foreground lowercase">
+          loading...
+        </p>
+      )}
+
+      {resumes === null && (
+        <div className="mt-12">
+          <EmptyState>sign in to manage resumes.</EmptyState>
         </div>
+      )}
 
-        {resumes === undefined && (
-          <p className="text-muted-foreground lowercase">Loading...</p>
-        )}
+      {resumes && resumes.length === 0 && (
+        <div className="mt-12">
+          <EmptyState>no resumes yet — create one to get started.</EmptyState>
+        </div>
+      )}
 
-        {resumes === null && (
-          <p className="text-muted-foreground lowercase">
-            Sign in to manage resumes.
-          </p>
-        )}
+      {resumes && resumes.length > 0 && (
+        <Reveal className="mt-8">
+          {resumes.map((resume, i) => {
+            let data: ResumeData | null = null;
+            try {
+              data = JSON.parse(resume.content);
+            } catch {
+              data = null;
+            }
+            const jp = resume.jobPosting
+              ? jobPostings?.find((j) => j._id === resume.jobPosting)
+              : undefined;
 
-        {resumes && resumes.length === 0 && (
-          <p className="text-muted-foreground lowercase">No resumes found.</p>
-        )}
-
-        {resumes && resumes.length > 0 && (
-          <div className="w-full max-w-2xl space-y-4">
-            {resumes.map((resume) => {
-              let data: ResumeData | null = null;
-              try {
-                data = JSON.parse(resume.content);
-              } catch {
-                data = null;
-              }
-
-              return (
-                <div
-                  key={resume._id}
-                  className="relative p-4 hover:bg-foreground/5"
-                >
-                  <Link
-                    href={`/admin/resumes/${resume._id}`}
-                    className="absolute inset-0"
-                  />
-                  <div className="flex items-center justify-between relative">
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(resume.createdAt).toLocaleDateString(
-                        undefined,
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        },
-                      )}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {data && (
-                        <DownloadResumeButton
-                          data={data}
-                          company={resume.jobPosting ? jobPostings?.find((j) => j._id === resume.jobPosting)?.company : undefined}
-                          position={resume.jobPosting ? jobPostings?.find((j) => j._id === resume.jobPosting)?.title : undefined}
-                        />
-                      )}
-                      {resume.jobPosting && (
-                        <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-500">
-                          {(() => {
-                            const jp = jobPostings?.find((j) => j._id === resume.jobPosting);
-                            return jp ? `${jp.title}${jp.company ? ` @ ${jp.company}` : ""}` : "Unknown";
-                          })()}
-                        </span>
-                      )}
-                      {resume.isFrontFacing && (
-                        <span className="rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-medium text-green-500">
-                          Live
-                        </span>
+            return (
+              <div
+                key={resume._id}
+                className="reveal-item row-hover group relative border-t hairline py-6 last:border-b"
+              >
+                <Link
+                  href={`/admin/resumes/${resume._id}`}
+                  className="absolute inset-0"
+                  aria-label={`Edit resume from ${new Date(resume.createdAt).toLocaleDateString()}`}
+                />
+                <div className="relative flex items-baseline gap-5">
+                  <span className="font-mono text-xs text-muted-foreground/60">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                        {new Date(resume.createdAt).toLocaleDateString(
+                          "en-CA",
+                          { year: "numeric", month: "short", day: "2-digit" },
+                        )}
+                      </span>
+                      {resume.isFrontFacing && <Pill tone="live">live</Pill>}
+                      {jp && (
+                        <Pill tone="muted">
+                          {jp.title}
+                          {jp.company ? ` @ ${jp.company}` : ""}
+                        </Pill>
                       )}
                     </div>
+                    {data && (
+                      <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                        {data.profile}
+                      </p>
+                    )}
                   </div>
                   {data && (
-                    <p className="mt-2 text-sm line-clamp-3">{data.profile}</p>
+                    <span className="relative shrink-0">
+                      <DownloadResumeButton
+                        data={data}
+                        company={jp?.company}
+                        position={jp?.title}
+                      />
+                    </span>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </main>
+              </div>
+            );
+          })}
+        </Reveal>
+      )}
+    </AdminShell>
   );
 }

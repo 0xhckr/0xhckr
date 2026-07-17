@@ -19,28 +19,45 @@ export async function GET(request: NextRequest) {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-        backgroundColor: "#000000",
+        justifyContent: "space-between",
+        backgroundColor: "#101010",
         padding: "80px",
       }}
     >
       <div
         style={{
           display: "flex",
-          flexGrow: 1,
+          alignItems: "center",
+          gap: "16px",
+          fontFamily: "Departure Mono",
+          fontSize: 24,
+          color: "#8f8b82",
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+        }}
+      >
+        <div
+          style={{
+            width: 12,
+            height: 12,
+            backgroundColor: "#e2a63d",
+          }}
+        />
+        0xhckr.dev
+      </div>
+      <div
+        style={{
+          display: "flex",
           flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: "24px",
+          gap: "28px",
         }}
       >
         <h1
           style={{
-            fontSize: 72,
+            fontSize: 84,
             fontWeight: 700,
             fontFamily: "Departure Mono",
-            color: "#3399cc",
+            color: "#ece7db",
             letterSpacing: "-0.02em",
             textAlign: "left",
             width: "100%",
@@ -48,14 +65,14 @@ export async function GET(request: NextRequest) {
             lineHeight: 1.1,
           }}
         >
-          # {title}
+          {title}
         </h1>
         <p
           style={{
             fontSize: 28,
             fontWeight: 400,
             fontFamily: "Departure Mono",
-            color: "#a3a3a3",
+            color: "#8f8b82",
             textAlign: "left",
             margin: 0,
             lineHeight: 1.4,
@@ -64,6 +81,14 @@ export async function GET(request: NextRequest) {
           {description}
         </p>
       </div>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          height: 1,
+          backgroundColor: "rgba(255,255,255,0.12)",
+        }}
+      />
     </div>,
     {
       width: 1200,

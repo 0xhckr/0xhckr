@@ -6,6 +6,7 @@ import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
+import { onPageReady } from "~/lib/page-ready";
 import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP);
@@ -20,57 +21,54 @@ const adminLinks = [
 export function AdminNavbar() {
   const pathname = usePathname();
   const { isSignedIn, isLoaded } = useAuth();
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      const container = ref.current;
-      if (!container) return;
-      const chars = gsap.utils.toArray<HTMLElement>(".admin-nav-char", container);
-      if (chars.length === 0) return;
-
-      gsap.set(chars, { opacity: 0 });
-      gsap.to(chars, {
-        opacity: 1,
-        duration: 0.03,
-        stagger: 0.03,
-        delay: 0.3,
+      const bar = ref.current;
+      if (!bar) return;
+      gsap.set(bar, { y: 16, opacity: 0 });
+      const cleanup = onPageReady(() => {
+        gsap.to(bar, {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: "power3.out",
+          delay: 0.4,
+        });
       });
+      return cleanup;
     },
     { scope: ref },
   );
 
-
+  if (!isLoaded || !isSignedIn) return null;
 
   return (
     <nav
-      className="fixed inset-x-0 top-0 z-30 flex justify-end"
+      ref={ref}
+      className="fixed inset-x-0 bottom-5 z-40 flex justify-center px-5"
       aria-label="Admin navigation"
     >
-      <div className="fixed inset-x-0 top-0 h-40 -z-[11] pointer-events-none bg-gradient-to-b from-black/80 to-transparent" />
-      <div className="fixed inset-x-0 top-0 h-40 -z-10 pointer-events-none backdrop-blur-xl [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-      <div
-        ref={ref}
-        className="block font-mono text-sm text-foreground/50 select-none mr-4 mt-4"
-      >
-        <div className="inline-flex items-center gap-4">
-          {isLoaded && isSignedIn && adminLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "inline-flex hover:text-foreground/80 transition-colors",
-                pathname === link.href ? "text-foreground/80" : "",
-              )}
-            >
-              {link.label.split("").map((char, i) => (
-                <span key={i} className="admin-nav-char inline-block">
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              ))}
-            </Link>
-          ))}
-        </div>
+      <div className="flex items-center gap-5 rounded-full border hairline bg-background/80 px-6 py-2.5 backdrop-blur-md">
+        <span className="font-mono text-[0.625rem] tracking-[0.25em] text-accent uppercase select-none">
+          admin
+        </span>
+        <span className="h-3 w-px bg-border" aria-hidden="true" />
+        {adminLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={cn(
+              "font-mono text-xs transition-colors",
+              pathname.startsWith(link.href)
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );

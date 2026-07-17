@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHeading } from "~/components/page-heading";
+import { PageHeader } from "~/components/page-header";
 import { generatePageMetadata } from "~/lib/metadata";
 import { VouchesGrid } from "./vouches-grid";
 
@@ -12,11 +12,13 @@ export const metadata: Metadata = generatePageMetadata({
 export default function VouchesPage() {
   return (
     <main id="main-content" tabIndex={-1}>
-      <div className="flex min-h-screen flex-col items-center px-4 sm:px-8">
-        <div className="tw-content my-auto w-full max-w-2xl lowercase pb-navbar pt-admin-navbar">
-          <PageHeading text="Vouches" inline />
-          <VouchesGrid />
-        </div>
+      <div className="mx-auto max-w-5xl px-5 pt-36 pb-24 sm:px-8 sm:pt-44">
+        <PageHeader
+          eyebrow="vouches"
+          title="Vouches"
+          description="People I've vouched for."
+        />
+        <VouchesGrid />
       </div>
     </main>
   );

@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 
-const ACCENT = "#003c3c";
+const ACCENT = "#8a6414";
 const TEXT = "#1a1a1a";
 const MUTED = "#6b7280";
 const LIGHT = "#f3f4f6";

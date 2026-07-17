@@ -4,6 +4,13 @@ import { useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Save, Sparkles, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import {
+  AdminPageHeader,
+  AdminSection,
+  AdminSelect,
+  AdminShell,
+  SaveBar,
+} from "~/components/admin/ui";
 import { DownloadCoverLetterButton } from "~/components/download-cover-letter-button";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
@@ -40,25 +47,21 @@ export default function EditCoverLetterPage() {
 
   if (coverLetter === undefined) {
     return (
-      <main id="main-content" tabIndex={-1}>
-        <div className="tw-content flex min-h-screen items-center justify-center pt-admin-navbar">
-          <p className="text-muted-foreground lowercase animate-pulse">
-            Loading...
-          </p>
-        </div>
-      </main>
+      <AdminShell>
+        <p className="font-mono text-xs text-muted-foreground lowercase">
+          loading...
+        </p>
+      </AdminShell>
     );
   }
 
   if (coverLetter === null) {
     return (
-      <main id="main-content" tabIndex={-1}>
-        <div className="tw-content flex min-h-screen items-center justify-center pt-admin-navbar">
-          <p className="text-muted-foreground lowercase">
-            Cover letter not found.
-          </p>
-        </div>
-      </main>
+      <AdminShell>
+        <p className="font-mono text-xs text-muted-foreground lowercase">
+          cover letter not found.
+        </p>
+      </AdminShell>
     );
   }
 
@@ -107,135 +110,104 @@ export default function EditCoverLetterPage() {
     }
   };
 
+  const selectedJp = selectedJobPosting
+    ? jobPostings?.find((j) => j._id === selectedJobPosting)
+    : undefined;
+
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col px-4 pt-admin-navbar pb-navbar sm:px-8">
-        <div className="w-full max-w-3xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => router.push("/admin/cover-letters")}
-              >
-                <ArrowLeft className="size-4" />
-              </Button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight lowercase">
-                  Edit Cover Letter
-                </h1>
-                <p className="text-xs text-muted-foreground lowercase">
-                  {new Date(coverLetter.createdAt).toLocaleDateString(
-                    undefined,
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    },
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <DownloadCoverLetterButton
-                content={draft}
-                jobTitle={
-                  selectedJobPosting
-                    ? jobPostings?.find((j) => j._id === selectedJobPosting)
-                        ?.title
-                    : undefined
-                }
-                company={
-                  selectedJobPosting
-                    ? jobPostings?.find((j) => j._id === selectedJobPosting)
-                        ?.company
-                    : undefined
-                }
-              />
-            </div>
-          </div>
+    <AdminShell>
+      <AdminPageHeader
+        eyebrow="admin / cover letters"
+        title="Edit letter"
+        meta={new Date(coverLetter.createdAt).toLocaleDateString("en-CA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      >
+        {draft && (
+          <DownloadCoverLetterButton
+            content={draft}
+            jobTitle={selectedJp?.title}
+            company={selectedJp?.company}
+          />
+        )}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => router.push("/admin/cover-letters")}
+          aria-label="Back to cover letters"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+      </AdminPageHeader>
 
-          {/* Actions Bar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="destructive" size="sm" onClick={handleDelete}>
-              <Trash2 className="size-3.5" />
-              delete
-            </Button>
-            <Button variant="ghost" size="sm" onClick={loadCoverLetter}>
-              discard changes
-            </Button>
-          </div>
-
-          {/* Job Posting */}
-          <section>
-            <div className="flex flex-col items-start justify-between mb-4 gap-4">
-              <h2 className="text-lg font-semibold tracking-tight lowercase">
-                Job Posting
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={generating}
-                onClick={handleGenerate}
-              >
-                <Sparkles className="size-3.5" />
-                {generating ? "generating..." : "generate with AI"}
-              </Button>
-            </div>
-            <select
-              value={selectedJobPosting ?? ""}
-              onChange={(e) => {
-                setSelectedJobPosting(
-                  (e.target.value || null) as Id<"jobPostings"> | null,
-                );
-                setDirty(true);
-              }}
-              className="w-full rounded-none bg-transparent px-3 py-2 text-sm lowercase focus:outline-none"
-            >
-              <option value="">None</option>
-              {jobPostings?.map((posting) => (
-                <option key={posting._id} value={posting._id}>
-                  {posting.title || "Untitled"} - {posting.company}
-                </option>
-              ))}
-            </select>
-          </section>
-
-          {/* Content */}
-          <section>
-            <div className="flex flex-col items-start justify-between mb-4 gap-4">
-              <h2 className="text-lg font-semibold tracking-tight lowercase">
-                Content
-              </h2>
-            </div>
-            <Textarea
-              value={draft}
-              onChange={(e) => {
-                setDraft(e.target.value);
-                setDirty(true);
-              }}
-              placeholder="Write your cover letter here..."
-              rows={20}
-            />
-          </section>
-
-          {/* Bottom Save Bar */}
-          {dirty && (
-            <div className="sticky bottom-navbar flex justify-end">
-              <Button
-                variant="default"
-                size="lg"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                <Save className="size-4" />
-                {saving ? "saving..." : "save cover letter"}
-              </Button>
-            </div>
-          )}
-        </div>
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <Button variant="destructive-outline" size="sm" onClick={handleDelete}>
+          <Trash2 className="size-3.5" />
+          delete
+        </Button>
+        <Button variant="ghost" size="sm" onClick={loadCoverLetter}>
+          discard changes
+        </Button>
       </div>
-    </main>
+
+      <AdminSection
+        index="01"
+        title="job posting"
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={generating}
+            onClick={handleGenerate}
+          >
+            <Sparkles className="size-3.5 text-accent" />
+            {generating ? "generating..." : "generate"}
+          </Button>
+        }
+      >
+        <AdminSelect
+          value={selectedJobPosting ?? ""}
+          onChange={(e) => {
+            setSelectedJobPosting(
+              (e.target.value || null) as Id<"jobPostings"> | null,
+            );
+            setDirty(true);
+          }}
+        >
+          <option value="">none</option>
+          {jobPostings?.map((posting) => (
+            <option key={posting._id} value={posting._id}>
+              {posting.title || "untitled"} — {posting.company}
+            </option>
+          ))}
+        </AdminSelect>
+      </AdminSection>
+
+      <AdminSection index="02" title="content">
+        <Textarea
+          value={draft}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setDirty(true);
+          }}
+          placeholder="Write your cover letter here..."
+          rows={20}
+        />
+      </AdminSection>
+
+      <SaveBar visible={dirty}>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          <Save className="size-3.5" />
+          {saving ? "saving..." : "save"}
+        </Button>
+      </SaveBar>
+    </AdminShell>
   );
 }

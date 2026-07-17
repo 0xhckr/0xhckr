@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { Reveal } from "~/components/reveal";
 import { api } from "../../../convex/_generated/api";
 
 function FaviconImg({ url }: { url: string }) {
@@ -24,39 +25,45 @@ export function VouchesGrid() {
   const vouches = useQuery(api.vouches.list);
 
   if (vouches === undefined) {
-    return <p className="mt-8 text-muted-foreground lowercase">Loading...</p>;
+    return (
+      <p className="mt-16 font-mono text-xs text-muted-foreground">
+        loading...
+      </p>
+    );
   }
 
   if (vouches.length === 0) {
     return (
-      <p className="mt-8 text-muted-foreground lowercase">No vouches yet.</p>
+      <p className="mt-16 font-mono text-xs text-muted-foreground">
+        no vouches yet.
+      </p>
     );
   }
 
   return (
-    <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {vouches.map((vouch) => (
-        <a
-          key={vouch._id}
-          href={vouch.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block p-4 transition-colors hover:bg-foreground/5"
-        >
-          <div className="flex items-center gap-3">
+    <Reveal className="mt-16 sm:mt-20">
+      <div className="grid grid-cols-1 gap-px border hairline bg-border sm:grid-cols-2">
+        {vouches.map((vouch) => (
+          <a
+            key={vouch._id}
+            href={vouch.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="reveal-item group flex items-center gap-4 bg-background px-6 py-6 transition-colors duration-300 hover:bg-foreground/[0.03]"
+          >
             <FaviconImg url={vouch.url} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium group-hover:underline">
+              <p className="truncate font-sans text-sm font-medium text-foreground transition-colors group-hover:text-accent">
                 {vouch.name}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate font-mono text-xs text-muted-foreground">
                 {new URL(vouch.url).hostname}
               </p>
             </div>
-            <ExternalLink className="size-4 shrink-0 text-muted-foreground/50 opacity-0 transition-opacity group-hover:opacity-100" />
-          </div>
-        </a>
-      ))}
-    </div>
+            <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
+          </a>
+        ))}
+      </div>
+    </Reveal>
   );
 }

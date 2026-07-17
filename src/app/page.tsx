@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { StoryScroll } from "~/components/story-scroll";
+import { Home } from "~/components/home";
 import { generatePageMetadata } from "~/lib/metadata";
 
 export const metadata: Metadata = generatePageMetadata({
@@ -8,6 +8,6 @@ export const metadata: Metadata = generatePageMetadata({
     "Software developer, homelab enthusiast, and a lover of Nix. Making things by smashing my hands on my keyboard.",
 });
 
-export default function Home() {
-  return <StoryScroll />;
+export default function HomePage() {
+  return <Home />;
 }

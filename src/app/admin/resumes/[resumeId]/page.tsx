@@ -3,7 +3,8 @@
 import { useMutation, useQuery } from "convex/react";
 import {
   ArrowLeft,
-  Eye,
+  ChevronDown,
+  ChevronUp,
   Plus,
   Save,
   Sparkles,
@@ -13,6 +14,15 @@ import {
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AdminPageHeader,
+  AdminSection,
+  AdminSelect,
+  AdminShell,
+  FieldLabel,
+  Pill,
+  SaveBar,
+} from "~/components/admin/ui";
 import { DownloadResumeButton } from "~/components/download-resume-button";
 import { Button } from "~/components/ui/button";
 import {
@@ -24,7 +34,6 @@ import {
   DialogPanel,
   DialogPopup,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Switch } from "~/components/ui/switch";
@@ -41,39 +50,22 @@ const blankResume: ResumeData = {
   education: null,
 };
 
-function SectionHeader({
-  title,
+function AddButton({
+  onClick,
   children,
 }: {
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col items-start justify-between mb-4 gap-4">
-      <h2 className="text-lg font-semibold tracking-tight lowercase">
-        {title}
-      </h2>
-      {children}
-    </div>
-  );
-}
-
-function Label({
-  children,
-  className,
-}: {
+  onClick: () => void;
   children: React.ReactNode;
-  className?: string;
 }) {
   return (
-    <label
-      className={cn(
-        "block text-xs font-medium text-muted-foreground lowercase tracking-wider mb-1.5",
-        className,
-      )}
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-24 w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed hairline font-mono text-xs text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
     >
+      <Plus className="size-3.5" />
       {children}
-    </label>
+    </button>
   );
 }
 
@@ -119,18 +111,20 @@ function ExperienceEditor({
   };
 
   return (
-    <div className="relative p-4 space-y-4">
+    <div className="relative space-y-5 rounded-md border hairline p-5">
       <Button
         type="button"
-        onClick={() => onRemove(index)}
-        className="absolute -top-2 right-2 text-muted-foreground hover:text-destructive transition-colors"
         variant="ghost"
+        size="icon-sm"
+        onClick={() => onRemove(index)}
+        aria-label="Remove experience"
+        className="absolute top-3 right-3 text-muted-foreground hover:text-destructive-foreground"
       >
-        X
+        <X className="size-4" />
       </Button>
 
-      <div className="flex flex-row gap-2">
-        <div>
+      <div className="flex flex-wrap items-center gap-2 pr-10">
+        <div className="w-20">
           <Input
             min={1997}
             max={2100}
@@ -147,8 +141,8 @@ function ExperienceEditor({
             placeholder={`${new Date().getFullYear()}`}
           />
         </div>
-        -
-        <div>
+        <span className="font-mono text-xs text-muted-foreground">—</span>
+        <div className="w-24">
           <Input
             value={endYear}
             onChange={(e) => {
@@ -162,8 +156,8 @@ function ExperienceEditor({
             placeholder="Present"
           />
         </div>
-        in
-        <div className="col-span-2">
+        <span className="font-mono text-xs text-muted-foreground">in</span>
+        <div className="min-w-32 flex-1">
           <Input
             value={address}
             onChange={(e) => {
@@ -175,10 +169,9 @@ function ExperienceEditor({
         </div>
       </div>
 
-      <div className="flex flex-row gap-2 justify-center items-center">
+      <div className="flex items-center gap-2">
         <div className="flex-1">
           <Input
-            className="text-sm"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
@@ -187,7 +180,7 @@ function ExperienceEditor({
             placeholder="Software Developer"
           />
         </div>
-        @
+        <span className="font-mono text-xs text-accent">@</span>
         <div className="flex-1">
           <Input
             value={company}
@@ -200,21 +193,19 @@ function ExperienceEditor({
         </div>
       </div>
 
-      <div>
-        <Textarea
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-            update({
-              description: e.target.value
-                .split("\n")
-                .filter((line) => line.trim() !== ""),
-            });
-          }}
-          placeholder="Led development of..."
-          rows={7}
-        />
-      </div>
+      <Textarea
+        value={description}
+        onChange={(e) => {
+          setDescription(e.target.value);
+          update({
+            description: e.target.value
+              .split("\n")
+              .filter((line) => line.trim() !== ""),
+          });
+        }}
+        placeholder="Led development of... (one bullet per line)"
+        rows={7}
+      />
     </div>
   );
 }
@@ -282,16 +273,19 @@ function SkillEditor({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {categories.map((category) => (
-        <div key={category} className="rounded-none p-4 space-y-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Label className="mb-0">{category}</Label>
-            <span className="text-xs text-muted-foreground">
+        <div
+          key={category}
+          className="space-y-4 rounded-md border hairline p-5"
+        >
+          <div className="flex items-baseline gap-2">
+            <FieldLabel className="mb-0">{category}</FieldLabel>
+            <span className="font-mono text-xs text-muted-foreground/60">
               ({grouped[category].length})
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {grouped[category].map((skill) => (
               <div
                 key={skill.originalIndex}
@@ -307,13 +301,13 @@ function SkillEditor({
                       !skill.isExpert,
                     )
                   }
-                  className="shrink-0 transition-colors text-muted-foreground hover:text-yellow-500"
+                  className="shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-accent"
                   title="Expert"
                 >
                   <Star
                     className={cn(
                       "size-3.5",
-                      skill.isExpert && "fill-yellow-500 text-yellow-500",
+                      skill.isExpert && "fill-accent text-accent",
                     )}
                   />
                 </button>
@@ -328,12 +322,12 @@ function SkillEditor({
                     )
                   }
                   placeholder="Skill name"
-                  className="text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => removeSkill(skill.originalIndex)}
-                  className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                  aria-label={`Remove ${skill.name || "skill"}`}
+                  className="shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-destructive-foreground"
                 >
                   <X className="size-4" />
                 </button>
@@ -342,7 +336,8 @@ function SkillEditor({
           </div>
           <Button
             variant="ghost"
-            className="w-full"
+            size="sm"
+            className="w-full font-mono text-xs text-muted-foreground"
             onClick={() => addSkill(category)}
           >
             <Plus className="size-3.5" />
@@ -351,21 +346,14 @@ function SkillEditor({
         </div>
       ))}
 
+      <AddButton onClick={() => setCategoryDialogOpen(true)}>
+        add category
+      </AddButton>
+
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
-        <DialogTrigger
-          render={
-            <Button
-              variant="ghost"
-              className="w-full h-40 border border-border/50"
-            />
-          }
-        >
-          <Plus className="size-3.5" />
-          add category
-        </DialogTrigger>
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle className="lowercase">New Category</DialogTitle>
+            <DialogTitle className="lowercase">New category</DialogTitle>
             <DialogDescription className="lowercase">
               Enter a name for the skill category.
             </DialogDescription>
@@ -427,15 +415,21 @@ function EducationEditor({
   };
 
   return (
-    <div className="space-y-4">
-      <Label className="inline-flex items-center gap-3 cursor-pointer">
-        <Switch checked={enabled} onCheckedChange={handleToggle} />
-        Include education section
-      </Label>
+    <div className="space-y-5">
+      <span className="inline-flex items-center gap-3">
+        <Switch
+          checked={enabled}
+          onCheckedChange={handleToggle}
+          aria-label="Include education section"
+        />
+        <span className="font-mono text-xs text-muted-foreground">
+          include education section
+        </span>
+      </span>
       {education && (
-        <div className="p-4 space-y-4">
+        <div className="space-y-5 rounded-md border hairline p-5">
           <div>
-            <Label>Degree</Label>
+            <FieldLabel>degree</FieldLabel>
             <Input
               value={education.degreeName}
               onChange={(e) =>
@@ -445,7 +439,7 @@ function EducationEditor({
             />
           </div>
           <div>
-            <Label>University</Label>
+            <FieldLabel>university</FieldLabel>
             <Input
               value={education.universityName}
               onChange={(e) =>
@@ -456,7 +450,7 @@ function EducationEditor({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Progression</Label>
+              <FieldLabel>progression</FieldLabel>
               <Input
                 value={education.progression}
                 onChange={(e) =>
@@ -466,7 +460,7 @@ function EducationEditor({
               />
             </div>
             <div>
-              <Label>GPA (optional)</Label>
+              <FieldLabel>gpa (optional)</FieldLabel>
               <Input
                 value={education.gpa ?? ""}
                 onChange={(e) =>
@@ -518,23 +512,21 @@ export default function EditResumePage() {
 
   if (resume === undefined) {
     return (
-      <main id="main-content" tabIndex={-1}>
-        <div className="tw-content flex min-h-screen items-center justify-center pt-admin-navbar">
-          <p className="text-muted-foreground lowercase animate-pulse">
-            Loading...
-          </p>
-        </div>
-      </main>
+      <AdminShell>
+        <p className="font-mono text-xs text-muted-foreground lowercase">
+          loading...
+        </p>
+      </AdminShell>
     );
   }
 
   if (resume === null) {
     return (
-      <main id="main-content" tabIndex={-1}>
-        <div className="tw-content flex min-h-screen items-center justify-center pt-admin-navbar">
-          <p className="text-muted-foreground lowercase">Resume not found.</p>
-        </div>
-      </main>
+      <AdminShell>
+        <p className="font-mono text-xs text-muted-foreground lowercase">
+          resume not found.
+        </p>
+      </AdminShell>
     );
   }
 
@@ -608,224 +600,192 @@ export default function EditResumePage() {
     setDirty(true);
   };
 
+  const selectedJp = selectedJobPosting
+    ? jobPostings?.find((j) => j._id === selectedJobPosting)
+    : undefined;
+
   return (
-    <main id="main-content" tabIndex={-1}>
-      <div className="tw-content flex min-h-screen flex-col px-4 pt-admin-navbar pb-navbar sm:px-8">
-        <div className="w-full max-w-3xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => router.push("/admin/resumes")}
-              >
-                <ArrowLeft className="size-4" />
-              </Button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight lowercase">
-                  Edit Resume
-                </h1>
-                <p className="text-xs text-muted-foreground lowercase">
-                  {new Date(resume.createdAt).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                  {resume.isFrontFacing && (
-                    <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5 text-[10px] font-medium text-green-500">
-                      <Eye className="size-3" /> live
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
+    <AdminShell>
+      <AdminPageHeader
+        eyebrow="admin / resumes"
+        title="Edit resume"
+        meta={new Date(resume.createdAt).toLocaleDateString("en-CA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      >
+        {resume.isFrontFacing && <Pill tone="live">live</Pill>}
+        <DownloadResumeButton
+          data={draft}
+          company={selectedJp?.company}
+          position={selectedJp?.title}
+        />
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => router.push("/admin/resumes")}
+          aria-label="Back to resumes"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+      </AdminPageHeader>
 
-            <div className="flex items-center gap-2">
-              <DownloadResumeButton
-                data={draft}
-                company={selectedJobPosting ? jobPostings?.find((j) => j._id === selectedJobPosting)?.company : undefined}
-                position={selectedJobPosting ? jobPostings?.find((j) => j._id === selectedJobPosting)?.title : undefined}
-              />
-            </div>
-          </div>
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <Button variant="destructive-outline" size="sm" onClick={handleDelete}>
+          <Trash2 className="size-3.5" />
+          delete
+        </Button>
+        <Button variant="ghost" size="sm" onClick={loadResume}>
+          discard changes
+        </Button>
+      </div>
 
-          {/* Actions Bar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="destructive" size="sm" onClick={handleDelete}>
-              <Trash2 className="size-3.5" />
-              delete
+      <AdminSection
+        index="01"
+        title="job posting"
+        actions={
+          !resume.isFrontFacing ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={generating}
+              onClick={async () => {
+                setGenerating(true);
+                try {
+                  const res = await fetch("/api/resumes/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      jobPostingId: selectedJobPosting ?? undefined,
+                    }),
+                  });
+                  if (!res.ok) {
+                    throw new Error(await res.text());
+                  }
+                  const data: ResumeData = await res.json();
+                  setDraft(data);
+                  setDirty(true);
+                } catch (err) {
+                  console.error("Generation failed:", err);
+                } finally {
+                  setGenerating(false);
+                }
+              }}
+            >
+              <Sparkles className="size-3.5 text-accent" />
+              {generating ? "generating..." : "generate"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={loadResume}>
-              discard changes
-            </Button>
-          </div>
+          ) : undefined
+        }
+      >
+        {resume.isFrontFacing ? (
+          <p className="font-mono text-xs text-muted-foreground lowercase">
+            the live resume cannot be linked to a job posting.
+          </p>
+        ) : (
+          <AdminSelect
+            value={selectedJobPosting ?? ""}
+            onChange={(e) => {
+              setSelectedJobPosting(
+                (e.target.value || null) as Id<"jobPostings"> | null,
+              );
+              setDirty(true);
+            }}
+          >
+            <option value="">none</option>
+            {jobPostings?.map((posting) => (
+              <option key={posting._id} value={posting._id}>
+                {posting.title || "untitled"} — {posting.company}
+              </option>
+            ))}
+          </AdminSelect>
+        )}
+      </AdminSection>
 
-          {/* Job Posting */}
-          <section>
-            <SectionHeader title="Job Posting">
-              {!resume.isFrontFacing && (
+      <AdminSection index="02" title="profile">
+        <Textarea
+          value={draft.profile}
+          onChange={(e) => updateField("profile", e.target.value)}
+          placeholder="Write a brief professional summary..."
+          rows={4}
+        />
+      </AdminSection>
+
+      <AdminSection index="03" title="experience">
+        <div className="space-y-4">
+          {draft.experiences.map((exp, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: editor rows have no stable id; state is positional
+            <div key={index} className="relative">
+              <div className="absolute top-4 -left-9 hidden flex-col sm:flex">
                 <Button
+                  type="button"
                   variant="ghost"
-                  size="sm"
-                  disabled={generating}
-                  onClick={async () => {
-                    setGenerating(true);
-                    try {
-                      const res = await fetch("/api/resumes/generate", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          jobPostingId: selectedJobPosting ?? undefined,
-                        }),
-                      });
-                      if (!res.ok) {
-                        throw new Error(await res.text());
-                      }
-                      const data: ResumeData = await res.json();
-                      setDraft(data);
-                      setDirty(true);
-                    } catch (err) {
-                      console.error("Generation failed:", err);
-                    } finally {
-                      setGenerating(false);
-                    }
-                  }}
+                  size="icon-xs"
+                  onClick={() => moveExperience(index, "up")}
+                  disabled={index === 0}
+                  aria-label="Move experience up"
+                  className="text-muted-foreground disabled:opacity-20"
                 >
-                  <Sparkles className="size-3.5" />
-                  {generating ? "generating..." : "generate"}
+                  <ChevronUp className="size-4" />
                 </Button>
-              )}
-            </SectionHeader>
-            {resume.isFrontFacing ? (
-              <p className="text-xs text-muted-foreground lowercase">
-                The live resume cannot be linked to a job posting.
-              </p>
-            ) : (
-              <select
-                value={selectedJobPosting ?? ""}
-                onChange={(e) => {
-                  setSelectedJobPosting(
-                    (e.target.value || null) as Id<"jobPostings"> | null,
-                  );
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => moveExperience(index, "down")}
+                  disabled={index === draft.experiences.length - 1}
+                  aria-label="Move experience down"
+                  className="text-muted-foreground disabled:opacity-20"
+                >
+                  <ChevronDown className="size-4" />
+                </Button>
+              </div>
+              <ExperienceEditor
+                experience={exp}
+                index={index}
+                onChange={(i, updated) => {
+                  setDraft((prev) => ({
+                    ...prev,
+                    experiences: prev.experiences.map((e, j) =>
+                      j === i ? updated : e,
+                    ),
+                  }));
                   setDirty(true);
                 }}
-                className="w-full rounded-none bg-transparent px-3 py-2 text-sm lowercase focus:outline-none"
-              >
-                <option value="">None</option>
-                {jobPostings?.map((posting) => (
-                  <option key={posting._id} value={posting._id}>
-                    {posting.title || "Untitled"} {posting.company}
-                  </option>
-                ))}
-              </select>
-            )}
-          </section>
-
-          {/* Editor Content */}
-          <div className="space-y-10">
-            {/* Profile */}
-            <section>
-              <SectionHeader title="Profile" />
-              <Textarea
-                value={draft.profile}
-                onChange={(e) => updateField("profile", e.target.value)}
-                placeholder="Write a brief professional summary..."
-                rows={4}
+                onRemove={removeExperience}
               />
-            </section>
-
-            {/* Experiences */}
-            <section className="space-y-4">
-              <SectionHeader title="Experiences" />
-
-              <div className="space-y-4">
-                {draft.experiences.map((exp, index) => (
-                  <div key={index} className="relative">
-                    <div className="absolute -left-6 top-4 flex flex-col gap-0.5">
-                      <Button
-                        type="button"
-                        onClick={() => moveExperience(index, "up")}
-                        disabled={index === 0}
-                        className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 -ml-2"
-                        title="Move up"
-                        variant="ghost"
-                      >
-                        ▲
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={() => moveExperience(index, "down")}
-                        disabled={index === draft.experiences.length - 1}
-                        className="text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 -ml-2"
-                        title="Move down"
-                        variant="ghost"
-                      >
-                        ▼
-                      </Button>
-                    </div>
-                    <ExperienceEditor
-                      experience={exp}
-                      index={index}
-                      onChange={(i, updated) => {
-                        setDraft((prev) => ({
-                          ...prev,
-                          experiences: prev.experiences.map((e, j) =>
-                            j === i ? updated : e,
-                          ),
-                        }));
-                        setDirty(true);
-                      }}
-                      onRemove={removeExperience}
-                    />
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                className="w-full h-40 border border-border/50"
-                onClick={addExperience}
-              >
-                <Plus className="size-3.5" />
-                add
-              </Button>
-            </section>
-
-            {/* Skills */}
-            <section>
-              <SectionHeader title="Skills" />
-              <SkillEditor
-                skills={draft.skills}
-                onChange={(skills) => updateField("skills", skills)}
-              />
-            </section>
-
-            {/* Education */}
-            <section>
-              <SectionHeader title="Education" />
-              <EducationEditor
-                education={draft.education}
-                onChange={(education) => updateField("education", education)}
-              />
-            </section>
-          </div>
-
-          {/* Bottom Save Bar */}
-          {dirty && (
-            <div className="sticky bottom-navbar flex justify-end">
-              <Button
-                variant="default"
-                size="lg"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                <Save className="size-4" />
-                {saving ? "saving..." : "save resume"}
-              </Button>
             </div>
-          )}
+          ))}
+          <AddButton onClick={addExperience}>add experience</AddButton>
         </div>
-      </div>
-    </main>
+      </AdminSection>
+
+      <AdminSection index="04" title="skills">
+        <SkillEditor
+          skills={draft.skills}
+          onChange={(skills) => updateField("skills", skills)}
+        />
+      </AdminSection>
+
+      <AdminSection index="05" title="education" className="mb-4">
+        <EducationEditor
+          education={draft.education}
+          onChange={(education) => updateField("education", education)}
+        />
+      </AdminSection>
+
+      <SaveBar visible={dirty}>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          <Save className="size-3.5" />
+          {saving ? "saving..." : "save"}
+        </Button>
+      </SaveBar>
+    </AdminShell>
   );
 }
