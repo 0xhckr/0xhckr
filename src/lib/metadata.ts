@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 const siteUrl = "https://0xhckr.dev";
 const siteName = "0xhckr";
 
-function ogImageUrl(title: string, description: string): string {
+function ogImageUrl(title: string, description: string, path?: string): string {
   const params = new URLSearchParams({ title, description });
+  if (path) params.set("path", path);
   return `${siteUrl}/api/og?${params.toString()}`;
 }
 
@@ -21,7 +22,7 @@ export function generatePageMetadata({
 }: PageMeta): Metadata {
   const fullTitle = path ? `${title} | ${siteName}` : `${siteName} | ${title}`;
   const url = `${siteUrl}${path}`;
-  const image = ogImageUrl(title, description);
+  const image = ogImageUrl(title, description, path || undefined);
 
   return {
     title: fullTitle,
