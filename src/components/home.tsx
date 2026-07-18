@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { CommitGraph } from "~/components/commit-graph";
 import { DitherHover } from "~/components/dither-hover";
 import { PixelMountains } from "~/components/pixel-mountains";
 import { ScrambleText } from "~/components/scramble-text";
@@ -198,7 +199,19 @@ export function Home() {
       <main id="main-content" tabIndex={-1}>
         {/* hero */}
         <section className="relative flex min-h-svh flex-col justify-center px-5 sm:px-8">
-          <div className="mx-auto w-full max-w-5xl">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 opacity-70"
+            style={{
+              maskImage:
+                "linear-gradient(to bottom, black 0%, transparent 40%, transparent 60%, black 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, black 0%, transparent 40%, transparent 60%, black 100%)",
+            }}
+          >
+            <CommitGraph />
+          </div>
+          <div className="relative z-10 mx-auto w-full max-w-5xl">
             <p className="hero-meta label">
               <span className="label-index">{"// "}</span>
               <ScrambleText
