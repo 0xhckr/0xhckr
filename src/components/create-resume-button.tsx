@@ -3,8 +3,8 @@
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { api } from "../../convex/_generated/api";
 import type { ResumeData } from "~/lib/resume";
+import { api } from "../../convex/_generated/api";
 
 const blankResume: ResumeData = {
   profile: "",

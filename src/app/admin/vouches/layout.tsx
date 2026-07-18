@@ -1,7 +1,8 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { fetchAuthQuery, isAuthenticated } from "~/lib/auth-server";
 import { generatePageMetadata } from "~/lib/metadata";
+import { api } from "../../../../convex/_generated/api";
 
 export const metadata: Metadata = generatePageMetadata({
   title: "Admin - Vouches",
@@ -16,17 +17,13 @@ export default async function AdminVouchesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = await auth();
-
-  if (!userId) {
+  if (!(await isAuthenticated())) {
     redirect("/sign-in");
   }
 
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
-  const email = user.emailAddresses[0]?.emailAddress;
+  const user = await fetchAuthQuery(api.auth.getCurrentUser);
 
-  if (email !== ALLOWED_EMAIL) {
+  if (user.email !== ALLOWED_EMAIL) {
     redirect("/unauthorized");
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
 import { FileDown } from "lucide-react";
+import { useCallback } from "react";
 import { Button } from "~/components/ui/button";
 import { generateResumePDF } from "~/lib/generate-resume-pdf";
 import type { ResumeData } from "~/lib/resume";
@@ -20,7 +20,11 @@ const buildResumeFilename = (company?: string, position?: string) => {
   return `${parts.join("_")}.pdf`;
 };
 
-export const DownloadResumeButton = ({ data, company, position }: DownloadResumeButtonProps) => {
+export const DownloadResumeButton = ({
+  data,
+  company,
+  position,
+}: DownloadResumeButtonProps) => {
   const handleClick = useCallback(async () => {
     const doc = await generateResumePDF(data);
     doc.save(buildResumeFilename(company, position));

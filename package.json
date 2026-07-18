@@ -20,7 +20,10 @@
   "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "@base-ui/react": "^1.4.1",
-    "@clerk/nextjs": "^7.2.3",
+    "@better-auth/passkey": "1.6.15",
+    "@better-auth/utils": "0.4.1",
+    "@better-fetch/fetch": "1.1.21",
+    "@convex-dev/better-auth": "0.12.5",
     "@gsap/react": "^2.1.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
@@ -28,9 +31,10 @@
     "@opennextjs/cloudflare": "^1.19.3",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/typography": "^0.5.19",
+    "better-auth": "~1.6.15",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "convex": "^1.35.1",
+    "convex": "^1.42.3",
     "gray-matter": "^4.0.3",
     "gsap": "^3.15.0",
     "jspdf": "^4.2.1",
@@ -57,8 +61,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "workerd",
-      "@clerk/shared"
+      "workerd"
     ]
   }
 }

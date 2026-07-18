@@ -1,12 +1,12 @@
 "use client";
 
-import { SignOutButton, useAuth } from "@clerk/nextjs";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrambleText } from "~/components/scramble-text";
+import { authClient } from "~/lib/auth-client";
 import { onPageReady } from "~/lib/page-ready";
 import { cn } from "~/lib/util";
 
@@ -22,7 +22,8 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const barRef = useRef<HTMLElement>(null);
@@ -112,12 +113,18 @@ export function Navbar() {
   );
 
   const authLink =
-    isLoaded && isSignedIn ? (
-      <SignOutButton redirectUrl="/">
-        <span className="link-sweep cursor-pointer text-muted-foreground transition-colors hover:text-foreground">
-          sign out
-        </span>
-      </SignOutButton>
+    !isPending && session ? (
+      <button
+        type="button"
+        onClick={async () => {
+          await authClient.signOut();
+          router.push("/");
+          router.refresh();
+        }}
+        className="link-sweep cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+      >
+        sign out
+      </button>
     ) : (
       <Link
         href="/sign-in"

@@ -1,11 +1,11 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
+import { authClient } from "~/lib/auth-client";
 import { onPageReady } from "~/lib/page-ready";
 import { cn } from "~/lib/util";
 
@@ -20,7 +20,7 @@ const adminLinks = [
 
 export function AdminNavbar() {
   const pathname = usePathname();
-  const { isSignedIn, isLoaded } = useAuth();
+  const { data: session, isPending } = authClient.useSession();
   const ref = useRef<HTMLElement>(null);
 
   useGSAP(
@@ -42,7 +42,7 @@ export function AdminNavbar() {
     { scope: ref },
   );
 
-  if (!isLoaded || !isSignedIn) return null;
+  if (isPending || !session) return null;
 
   return (
     <nav

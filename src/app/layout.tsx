@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
@@ -8,6 +7,7 @@ import { PageLoader } from "~/components/page-loader";
 import { Providers } from "~/components/providers";
 import "./globals.css";
 import { AmbientBackground } from "~/components/ambient-background";
+import { getToken } from "~/lib/auth-server";
 import { cn } from "~/lib/utils";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -76,11 +76,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const token = await getToken();
   return (
     <html
       lang="en"
@@ -123,23 +124,14 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${departureMono.variable} antialiased`}
       >
-        <ClerkProvider
-          signInUrl="/sign-in"
-          signUpUrl="/sign-in"
-          afterSignOutUrl="/"
-          {...({
-            __internal_invokeMiddlewareOnAuthStateChange: false,
-          } as object)}
-        >
-          <Providers>
-            <PageLoader>
-              <AmbientBackground />
-              <Navbar />
-              <AdminNavbar />
-              <main className="relative z-10">{children}</main>
-            </PageLoader>
-          </Providers>
-        </ClerkProvider>
+        <Providers initialToken={token}>
+          <PageLoader>
+            <AmbientBackground />
+            <Navbar />
+            <AdminNavbar />
+            <main className="relative z-10">{children}</main>
+          </PageLoader>
+        </Providers>
       </body>
     </html>
   );

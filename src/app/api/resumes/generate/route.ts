@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { isAuthenticated } from "~/lib/auth-server";
 
 const OPENROUTER_API_KEY = process.env.OPEN_ROUTER_API_KEY;
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -112,8 +112,7 @@ const RESUME_JSON_SCHEMA = {
 };
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
+  if (!(await isAuthenticated())) {
     return Response.json({ error: "Not authenticated" }, { status: 401 });
   }
 
