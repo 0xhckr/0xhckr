@@ -4,7 +4,7 @@ export const config = {
   matcher: ["/admin/:path*"],
 };
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const sessionToken =
     request.cookies.get("better-auth.session_token") ??
     request.cookies.get("__Secure-better-auth.session_token");

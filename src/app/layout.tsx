@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
-import localFont from "next/font/local";
 import { AdminNavbar } from "~/components/admin-navbar";
 import { Navbar } from "~/components/navbar";
 import { PageLoader } from "~/components/page-loader";
@@ -8,25 +6,6 @@ import { Providers } from "~/components/providers";
 import "./globals.css";
 import { AmbientBackground } from "~/components/ambient-background";
 import { getToken } from "~/lib/auth-server";
-import { cn } from "~/lib/utils";
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-});
-
-const departureMono = localFont({
-  src: "../fonts/DepartureMono-Regular.otf",
-  variable: "--font-departure-mono",
-  weight: "400",
-  style: "normal",
-  display: "swap",
-});
 
 const siteUrl = "https://0xhckr.dev";
 
@@ -83,17 +62,18 @@ export default async function RootLayout({
 }>) {
   const token = await getToken();
   return (
-    <html
-      lang="en"
-      dir="ltr"
-      className={cn(
-        "dark",
-        dmSans.variable,
-        departureMono.variable,
-        jetbrainsMono.variable,
-      )}
-    >
+    <html lang="en" dir="ltr" className="dark">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -121,9 +101,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${dmSans.variable} ${departureMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <Providers initialToken={token}>
           <PageLoader>
             <AmbientBackground />

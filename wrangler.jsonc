@@ -1,31 +1,21 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
   "name": "0xhckrdev",
+  "main": "./worker/index.ts",
   "compatibility_date": "2026-04-13",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "not_found_handling": "none"
   },
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "0xhckrdev"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "0xhckrdev-opennext-cache"
-    }
+  "kv_namespaces": [
+    { "binding": "VINEXT_KV_CACHE", "id": "<your-kv-namespace-id>" }
   ],
   "images": {
     "binding": "IMAGES"
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "cache": { "enabled": true }
 }

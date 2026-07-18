@@ -1,8 +1,10 @@
-import fs from "node:fs";
-import path from "node:path";
 import matter from "gray-matter";
 
-const postsDir = path.join(process.cwd(), "content/blog");
+const postFiles = import.meta.glob("/content/blog/*.mdx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
 
 interface PostMeta {
   slug: string;
@@ -11,43 +13,48 @@ interface PostMeta {
   date: string;
 }
 
-export function getPostMetaList(): PostMeta[] {
-  const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".mdx"));
-  const posts = files.map((filename) => {
-    const slug = filename.replace(/\.mdx$/, "");
-    const raw = fs.readFileSync(path.join(postsDir, filename), "utf-8");
-    const { data } = matter(raw);
-    return {
-      slug,
-      title: data.title ?? slug,
-      description: data.description ?? "",
-      date: data.date ?? "",
-    };
-  });
-
-  return posts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
+interface Post {
+  meta: PostMeta;
+  content: string;
 }
 
-export function getPostBySlug(slug: string) {
-  const filePath = path.join(postsDir, `${slug}.mdx`);
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
-  return {
-    meta: {
+const posts: Record<string, Post> = Object.fromEntries(
+  Object.entries(postFiles).map(([filePath, raw]) => {
+    const slug =
+      filePath
+        .split("/")
+        .at(-1)
+        ?.replace(/\.mdx$/, "") ?? filePath;
+    const { data, content } = matter(raw);
+    return [
       slug,
-      title: data.title ?? slug,
-      description: data.description ?? "",
-      date: String(data.date ?? ""),
-    },
-    content,
-  };
+      {
+        meta: {
+          slug,
+          title: data.title ?? slug,
+          description: data.description ?? "",
+          date: String(data.date ?? ""),
+        },
+        content,
+      },
+    ];
+  }),
+);
+
+export function getPostMetaList(): PostMeta[] {
+  return Object.values(posts)
+    .map((post) => post.meta)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+export function getPostBySlug(slug: string): Post {
+  const post = posts[slug];
+  if (!post) {
+    throw new Error(`Post not found: ${slug}`);
+  }
+  return post;
 }
 
 export function getAllSlugs(): string[] {
-  return fs
-    .readdirSync(postsDir)
-    .filter((f) => f.endsWith(".mdx"))
-    .map((f) => f.replace(/\.mdx$/, ""));
+  return Object.keys(posts);
 }

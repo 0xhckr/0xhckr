@@ -31,8 +31,10 @@
               openssl
               zlib
             ])}"
+            # workerd (vinext dev) needs a CA bundle for outbound TLS
+            export SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
 
-            echo "Next.js + Turbopack environment ready"
+            echo "vinext + Vite environment ready"
           '';
         };
 
