@@ -292,10 +292,6 @@ export function Home() {
               <p className="font-sans text-2xl font-semibold tracking-tight">
                 0xhckr<span className="text-accent">.</span>
               </p>
-              <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                building most things with typescript, react, and tailwind —
-                currently learning rust.
-              </p>
             </div>
             <div className="fade-up">
               <p className="font-mono text-[0.625rem] tracking-[0.3em] text-accent uppercase">
