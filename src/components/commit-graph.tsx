@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 interface ContributionDay {
   date: string;
@@ -21,6 +21,27 @@ export function CommitGraph() {
     x: number;
     y: number;
   } | null>(null);
+  const tipRef = useRef<HTMLDivElement>(null);
+  const [tipPos, setTipPos] = useState<{ left: number; top: number } | null>(
+    null,
+  );
+
+  useLayoutEffect(() => {
+    const el = tipRef.current;
+    if (!hover || !el) {
+      setTipPos(null);
+      return;
+    }
+    const { width, height } = el.getBoundingClientRect();
+    const pad = 8;
+    const cx = Math.min(
+      Math.max(hover.x, width / 2 + pad),
+      window.innerWidth - width / 2 - pad,
+    );
+    let top = hover.y - height - 10;
+    if (top < pad) top = hover.y + 16;
+    setTipPos({ left: cx - width / 2, top });
+  }, [hover]);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,8 +146,11 @@ export function CommitGraph() {
 
       {hover && (
         <div
-          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-[calc(100%+10px)] border border-border bg-popover px-2.5 py-1.5 font-mono text-[0.625rem] whitespace-nowrap text-popover-foreground shadow-md"
-          style={{ left: hover.x, top: hover.y }}
+          ref={tipRef}
+          className="pointer-events-none fixed z-50 border border-border bg-popover px-2.5 py-1.5 font-mono text-[0.625rem] whitespace-nowrap text-popover-foreground shadow-md"
+          style={
+            tipPos ?? { left: hover.x, top: hover.y, visibility: "hidden" }
+          }
         >
           <span className="text-accent">{hover.day.count}</span>{" "}
           {hover.day.count === 1 ? "commit" : "commits"} on{" "}
