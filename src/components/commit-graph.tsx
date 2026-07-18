@@ -17,6 +17,7 @@ export function CommitGraph() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [hover, setHover] = useState<{
     day: ContributionDay;
+    idx: number;
     x: number;
     y: number;
   } | null>(null);
@@ -88,29 +89,34 @@ export function CommitGraph() {
           onMouseMove={(e) => {
             const t = e.target;
             if (t instanceof SVGRectElement) {
-              const c = cells[Number(t.getAttribute("data-i"))];
-              if (c) setHover({ day: c.day, x: e.clientX, y: e.clientY });
+              const idx = Number(t.getAttribute("data-i"));
+              const c = cells[idx];
+              if (c) setHover({ day: c.day, idx, x: e.clientX, y: e.clientY });
             }
           }}
           onMouseLeave={() => setHover(null)}
         >
-          {cells.map((c, i) => (
-            <rect
-              key={c.day.date}
-              data-i={i}
-              x={c.x}
-              y={c.y}
-              width={cell}
-              height={cell}
-              fill="currentColor"
-              opacity={
-                c.day.level === 0
-                  ? LEVEL_OPACITY[0]
-                  : LEVEL_OPACITY[c.day.level]
-              }
-              className={c.day.level === 0 ? "text-foreground" : "text-accent"}
-            />
-          ))}
+          {cells.map((c, i) => {
+            const base =
+              c.day.level === 0 ? LEVEL_OPACITY[0] : LEVEL_OPACITY[c.day.level];
+            return (
+              <rect
+                key={c.day.date}
+                data-i={i}
+                x={c.x}
+                y={c.y}
+                width={cell}
+                height={cell}
+                fill="currentColor"
+                opacity={hover && hover.idx !== i ? base * 0.5 : base}
+                className={
+                  c.day.level === 0
+                    ? "text-foreground transition-opacity duration-150"
+                    : "text-accent transition-opacity duration-150"
+                }
+              />
+            );
+          })}
         </svg>
       )}
 
