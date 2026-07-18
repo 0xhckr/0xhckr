@@ -6,7 +6,7 @@ const FG = "#e9e8e4";
 const MUTED = "#82807b";
 const ACCENT = "#e7b643";
 const HAIRLINE = "rgba(255,255,255,0.08)";
-const GRID_LINE = "rgba(255,255,255,0.25)";
+const GRID_LINE = "rgba(255,255,255,0.04)";
 
 async function loadDmSans(weight: 400 | 600): Promise<ArrayBuffer> {
   const css = await fetch(
@@ -71,9 +71,18 @@ export async function GET(request: NextRequest) {
   fontsPromise ??= loadFonts();
   const { fonts, hasSans } = await fontsPromise;
   const sans = hasSans ? "DM Sans" : "Departure Mono";
+  const truncate = (s: string, n: number) => {
+    if (s.length <= n) return s;
+    const cut = s.slice(0, n);
+    const lastSpace = cut.lastIndexOf(" ");
+    return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+  };
   const trimmed = title.trim();
-  const keepPunct = /[!?…]$/.test(trimmed);
-  const bareTitle = trimmed.replace(/\.$/, "");
+  const bareTitle = truncate(trimmed.replace(/\.$/, ""), 160);
+  const titleSize =
+    bareTitle.length > 80 ? 56 : bareTitle.length > 25 ? 68 : 84;
+  const showAccentDot = bareTitle.length <= 25 && !/[!?…]$/.test(bareTitle);
+  const displayDescription = truncate(description, 170);
 
   return new ImageResponse(
     <div
@@ -94,7 +103,7 @@ export async function GET(request: NextRequest) {
           width: "100%",
           height: "100%",
           display: "flex",
-          backgroundImage: "linear-gradient(to right, red 50%, blue 50%)",
+          backgroundImage: `linear-gradient(to right, ${GRID_LINE} 1px, transparent 1px), linear-gradient(to bottom, ${GRID_LINE} 1px, transparent 1px)`,
           backgroundSize: "72px 72px",
           backgroundRepeat: "repeat",
         }}
@@ -107,7 +116,7 @@ export async function GET(request: NextRequest) {
           width: "100%",
           height: "100%",
           display: "flex",
-          backgroundImage: `radial-gradient(ellipse at 50% 0%, rgba(13,12,11,0) 25%, ${BG} 78%), radial-gradient(ellipse at 50% 50%, rgba(13,12,11,0) 55%, rgba(13,12,11,0.6) 100%)`,
+          backgroundImage: `linear-gradient(to bottom, rgba(13,12,11,0) 0%, rgba(13,12,11,0) 30%, ${BG} 80%)`,
         }}
       />
       <div
@@ -144,7 +153,7 @@ export async function GET(request: NextRequest) {
         >
           <h1
             style={{
-              fontSize: 82,
+              fontSize: titleSize,
               fontWeight: 600,
               fontFamily: sans,
               color: FG,
@@ -153,11 +162,10 @@ export async function GET(request: NextRequest) {
               width: "100%",
               margin: 0,
               lineHeight: 1.05,
-              lineClamp: 3,
             }}
           >
-            {keepPunct ? trimmed : bareTitle}
-            {keepPunct ? null : <span style={{ color: ACCENT }}>.</span>}
+            {bareTitle}
+            {showAccentDot ? <span style={{ color: ACCENT }}>.</span> : null}
           </h1>
           <p
             style={{
@@ -168,10 +176,9 @@ export async function GET(request: NextRequest) {
               textAlign: "left",
               margin: 0,
               lineHeight: 1.45,
-              lineClamp: 2,
             }}
           >
-            {description}
+            {displayDescription}
           </p>
         </div>
         <div
