@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { ArrowUpRight } from "lucide-react";
+import { DitherHover } from "~/components/dither-hover";
 import { Reveal } from "~/components/reveal";
 import { api } from "../../../convex/_generated/api";
 
@@ -49,18 +50,21 @@ export function VouchesGrid() {
             href={vouch.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="reveal-item group flex items-center gap-4 bg-background px-6 py-6 transition-colors duration-300 hover:bg-foreground/[0.03]"
+            className="reveal-item group relative block bg-background px-6 py-6 transition-colors duration-300 hover:bg-foreground/[0.03]"
           >
-            <FaviconImg url={vouch.url} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-sans text-sm font-medium text-foreground transition-colors group-hover:text-accent">
-                {vouch.name}
-              </p>
-              <p className="truncate font-mono text-xs text-muted-foreground">
-                {new URL(vouch.url).hostname}
-              </p>
+            <DitherHover />
+            <div className="relative flex items-center gap-4">
+              <FaviconImg url={vouch.url} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-sans text-sm font-medium text-foreground transition-colors group-hover:text-accent">
+                  {vouch.name}
+                </p>
+                <p className="truncate font-mono text-xs text-muted-foreground">
+                  {new URL(vouch.url).hostname}
+                </p>
+              </div>
+              <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
             </div>
-            <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
           </a>
         ))}
       </div>
