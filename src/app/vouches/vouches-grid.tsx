@@ -6,8 +6,17 @@ import { DitherHover } from "~/components/dither-hover";
 import { Reveal } from "~/components/reveal";
 import { api } from "../../../convex/_generated/api";
 
+function safeHostname(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
+
 function FaviconImg({ url }: { url: string }) {
-  const hostname = new URL(url).hostname;
+  const hostname = safeHostname(url);
+  if (!hostname) return null;
   const src = `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
 
   return (
@@ -60,7 +69,7 @@ export function VouchesGrid() {
                   {vouch.name}
                 </p>
                 <p className="truncate font-mono text-xs text-muted-foreground">
-                  {new URL(vouch.url).hostname}
+                  {safeHostname(vouch.url) ?? vouch.url}
                 </p>
               </div>
               <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
