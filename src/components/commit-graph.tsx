@@ -73,10 +73,12 @@ export function CommitGraph() {
     y: Math.floor(i / cols) * pitch,
   }));
 
+  const offsetX = Math.floor((size.w - gridW) / 2);
+
   return (
     <div
       ref={ref}
-      className="absolute inset-x-0 top-16 bottom-0 flex items-start justify-center overflow-hidden"
+      className="absolute inset-x-0 top-16 bottom-0 overflow-hidden"
     >
       {cells.length > 0 && size.w > 0 && size.h > 0 && (
         <svg
@@ -86,6 +88,7 @@ export function CommitGraph() {
           shapeRendering="crispEdges"
           aria-hidden="true"
           className="block text-accent"
+          style={{ transform: `translateX(${offsetX}px)` }}
           onMouseMove={(e) => {
             const t = e.target;
             if (t instanceof SVGRectElement) {
