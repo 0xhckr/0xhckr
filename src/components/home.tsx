@@ -4,9 +4,10 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrambleText } from "~/components/scramble-text";
 import { onPageReady } from "~/lib/page-ready";
+import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -101,6 +102,13 @@ const NoscriptContent = () => (
 
 export function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setHasScrolled(true);
+    window.addEventListener("scroll", onScroll, { once: true, passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useGSAP(
     () => {
@@ -214,14 +222,14 @@ export function Home() {
           </div>
 
           <div className="hero-meta absolute inset-x-0 bottom-10 flex justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <span className="font-mono text-[0.625rem] tracking-[0.3em] text-muted-foreground uppercase select-none">
-                scroll
-              </span>
-              <span className="h-10 w-px overflow-hidden bg-foreground/10">
-                <span className="block h-full w-full origin-top animate-[scrollhint_1.8s_ease-in-out_infinite] bg-accent" />
-              </span>
-            </div>
+            <span
+              className={cn(
+                "font-mono text-[0.625rem] tracking-[0.2em] text-muted-foreground uppercase select-none transition-opacity duration-500",
+                hasScrolled && "pointer-events-none opacity-0",
+              )}
+            >
+              psst! there's more stuff below
+            </span>
           </div>
         </section>
 
