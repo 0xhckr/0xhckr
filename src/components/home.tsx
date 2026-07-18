@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { PixelMountains } from "~/components/pixel-mountains";
 import { ScrambleText } from "~/components/scramble-text";
 import { onPageReady } from "~/lib/page-ready";
 import { cn } from "~/lib/util";
@@ -284,47 +285,72 @@ export function Home() {
           </div>
         </section>
 
-        {/* contact */}
-        <section className="px-5 py-24 sm:px-8 sm:py-32">
-          <div className="mx-auto max-w-5xl">
-            <SectionHeading index="03" title="get in touch" />
-            <div className="mt-10 grid gap-px overflow-hidden border hairline bg-border sm:mt-14 sm:grid-cols-2">
-              {contactLinks.map((l) => {
-                const isExternal = !l.href.startsWith("mailto:");
-                return (
-                  <a
-                    key={l.label}
-                    href={l.href}
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                    className="fade-up group flex items-center justify-between gap-4 bg-background px-6 py-6 transition-colors duration-300 hover:bg-foreground/[0.03] sm:px-8 sm:py-8"
-                  >
-                    <div>
-                      <p className="font-mono text-xs tracking-[0.15em] text-muted-foreground uppercase">
-                        {l.label}
-                      </p>
-                      <p className="mt-1.5 font-sans text-base text-foreground/90 transition-colors group-hover:text-accent">
-                        {l.meta}
-                      </p>
-                    </div>
-                    <ArrowUpRight className="size-4 shrink-0 text-muted-foreground/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
-                  </a>
-                );
-              })}
+        {/* footer */}
+        <footer className="border-t hairline">
+          <div className="mx-auto grid max-w-5xl gap-12 px-5 py-16 sm:grid-cols-[1.4fr_1fr_1fr] sm:px-8 sm:py-20">
+            <div className="fade-up">
+              <p className="font-sans text-2xl font-semibold tracking-tight">
+                0xhckr<span className="text-accent">.</span>
+              </p>
+              <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                building most things with typescript, react, and tailwind —
+                currently learning rust.
+              </p>
+            </div>
+            <div className="fade-up">
+              <p className="font-mono text-[0.625rem] tracking-[0.3em] text-accent uppercase">
+                projects
+              </p>
+              <ul className="mt-5 space-y-3">
+                {projects.map((p) => (
+                  <li key={p.title}>
+                    {p.href ? (
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group font-mono text-sm text-muted-foreground transition-colors hover:text-accent"
+                      >
+                        {p.title}
+                        <ArrowUpRight className="mb-0.5 ml-1.5 inline-block size-3.5 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
+                      </a>
+                    ) : (
+                      <span className="font-mono text-sm text-muted-foreground/50">
+                        {p.title}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="fade-up">
+              <p className="font-mono text-[0.625rem] tracking-[0.3em] text-accent uppercase">
+                elsewhere
+              </p>
+              <ul className="mt-5 space-y-3">
+                {contactLinks.map((l) => (
+                  <li key={l.label}>
+                    <a
+                      href={l.href}
+                      target={
+                        l.href.startsWith("mailto:") ? undefined : "_blank"
+                      }
+                      rel={
+                        l.href.startsWith("mailto:")
+                          ? undefined
+                          : "noopener noreferrer"
+                      }
+                      className="group font-mono text-sm text-muted-foreground transition-colors hover:text-accent"
+                    >
+                      {l.label}
+                      <ArrowUpRight className="mb-0.5 ml-1.5 inline-block size-3.5 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </section>
-
-        {/* footer */}
-        <footer className="border-t hairline px-5 py-10 sm:px-8">
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="font-mono text-xs text-muted-foreground">
-              <span className="text-accent">©</span> 2026 0xhckr
-            </p>
-            <p className="font-mono text-xs text-muted-foreground/60">
-              nixos · next.js · gsap
-            </p>
-          </div>
+          <PixelMountains />
         </footer>
       </main>
     </div>
