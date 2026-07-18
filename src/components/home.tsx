@@ -193,15 +193,10 @@ export function Home() {
                 </span>
               </span>
             </h1>
-            <div className="mt-10 flex flex-col gap-6 sm:mt-14 sm:flex-row sm:items-end sm:justify-between">
-              <p className="hero-meta max-w-md text-[0.9375rem] leading-relaxed text-muted-foreground sm:text-base">
-                I build most things with TypeScript, React, and Tailwind.
-                Currently on my journey to learn Rust.
-              </p>
-              <div className="hero-meta flex items-center font-mono text-xs text-muted-foreground select-none">
-                software developer
-              </div>
-            </div>
+            <p className="hero-meta mt-10 max-w-md text-[0.9375rem] leading-relaxed text-muted-foreground sm:mt-14 sm:text-base">
+              I'm a software developer building most things with TypeScript,
+              React, and Tailwind. Currently on my journey to learn Rust.
+            </p>
           </div>
 
           <div className="hero-meta absolute inset-x-0 bottom-10 flex justify-center">
