@@ -48,15 +48,20 @@ export function CommitGraph() {
   }, []);
 
   const n = days.length;
-  const cols = Math.max(
+  let cols = Math.max(
     1,
     Math.round(Math.sqrt((n * size.w) / Math.max(1, size.h))),
   );
-  const rows = Math.max(1, Math.ceil(n / cols));
-  const pitch = Math.max(
-    Math.ceil((size.w + GAP) / cols),
-    Math.ceil((size.h + GAP) / rows),
-  );
+  let rows = Math.max(1, Math.ceil(n / cols));
+  let minPitch = Math.ceil((size.w + GAP) / cols);
+  let maxPitch = Math.max(1, Math.floor((size.h + GAP) / rows));
+  while (minPitch > maxPitch && cols < n) {
+    cols += 1;
+    rows = Math.max(1, Math.ceil(n / cols));
+    minPitch = Math.ceil((size.w + GAP) / cols);
+    maxPitch = Math.max(1, Math.floor((size.h + GAP) / rows));
+  }
+  const pitch = minPitch <= maxPitch ? maxPitch : minPitch;
   const cell = Math.max(4, pitch - GAP);
   const gridW = cols * pitch - GAP;
   const gridH = rows * pitch - GAP;
