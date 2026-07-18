@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 
 const CELL = 7;
-const DITHER = 0.5;
+const GROWTH = 1.2;
+const FALLOFF = 2.4;
 
 const BAYER = [
   0 / 16,
@@ -54,10 +55,9 @@ export function DitherHover() {
         for (let x = 0; x < cols; x++) {
           const b = BAYER[(y % 4) * 4 + (x % 4)];
           const dist = Math.hypot(x - cols, y - rows) / maxDist;
-          const margin = progress * (1 + DITHER) - b * DITHER - dist;
-          if (margin <= 0) continue;
-          const fade = 1 - dist;
-          ctx.globalAlpha = (margin > 0.22 ? 0.38 : 0.16) * fade * fade;
+          const density = progress * GROWTH - dist * FALLOFF;
+          if (density <= b) continue;
+          ctx.globalAlpha = density > 0.85 ? 0.4 : 0.3;
           ctx.fillRect(x, y, 1, 1);
         }
       }

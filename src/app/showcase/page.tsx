@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
+import { DitherHover } from "~/components/dither-hover";
 import { PageHeader } from "~/components/page-header";
 import { Reveal } from "~/components/reveal";
 import { generatePageMetadata } from "~/lib/metadata";
@@ -71,9 +72,10 @@ export default function Showcase() {
               href={project.link}
               target={project.link ? "_blank" : undefined}
               rel={project.link ? "noopener noreferrer" : undefined}
-              className="reveal-item row-hover group block border-t hairline py-8 sm:py-10"
+              className="reveal-item row-hover group relative block border-t hairline py-8 sm:py-10"
             >
-              <div className="flex items-baseline gap-5 sm:gap-8">
+              <DitherHover />
+              <div className="relative flex items-baseline gap-5 sm:gap-8">
                 <span className="font-mono text-xs text-muted-foreground/60">
                   {String(i + 1).padStart(2, "0")}
                 </span>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DitherHover } from "~/components/dither-hover";
 import { PageHeader } from "~/components/page-header";
 import { Reveal } from "~/components/reveal";
 import { getPostMetaList } from "~/lib/blog";
@@ -30,9 +31,10 @@ export default function Blog() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="reveal-item row-hover group block border-t hairline py-7 sm:py-8"
+              className="reveal-item row-hover group relative block border-t hairline py-7 sm:py-8"
             >
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:gap-10">
+              <DitherHover />
+              <div className="relative flex flex-col gap-2 sm:flex-row sm:items-baseline sm:gap-10">
                 {post.date && (
                   <time
                     dateTime={post.date}
