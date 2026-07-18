@@ -96,10 +96,15 @@ export default function AdminResumesPage() {
                       </span>
                       {resume.isFrontFacing && <Pill tone="live">live</Pill>}
                       {jp && (
-                        <Pill tone="muted">
-                          {jp.title}
-                          {jp.company ? ` @ ${jp.company}` : ""}
-                        </Pill>
+                        <Link
+                          href={`/admin/job-postings/${jp._id}`}
+                          className="relative transition-opacity hover:opacity-70"
+                        >
+                          <Pill tone="muted">
+                            {jp.title}
+                            {jp.company ? ` @ ${jp.company}` : ""}
+                          </Pill>
+                        </Link>
                       )}
                     </div>
                     {data && (
