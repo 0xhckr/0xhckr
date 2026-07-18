@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "0xhckrdev",
   "main": "./worker/index.ts",
+  "account_id": "3384f0c121186684d1ff5ba91cb5b23a",
   "compatibility_date": "2026-04-13",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
@@ -9,7 +10,7 @@
     "not_found_handling": "none"
   },
   "kv_namespaces": [
-    { "binding": "VINEXT_KV_CACHE", "id": "<your-kv-namespace-id>" }
+    { "binding": "VINEXT_KV_CACHE", "id": "b831ce727b4e40df94d471c0181b4cef" }
   ],
   "images": {
     "binding": "IMAGES"
