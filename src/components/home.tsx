@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { DitherHover } from "~/components/dither-hover";
 import { PixelMountains } from "~/components/pixel-mountains";
 import { ScrambleText } from "~/components/scramble-text";
 import { onPageReady } from "~/lib/page-ready";
@@ -262,9 +263,10 @@ export function Home() {
                   href={p.href}
                   target={p.href ? "_blank" : undefined}
                   rel={p.href ? "noopener noreferrer" : undefined}
-                  className="fade-up row-hover group block border-t hairline py-8 sm:py-10"
+                  className="fade-up row-hover group relative block border-t hairline py-8 sm:py-10"
                 >
-                  <div className="flex items-baseline gap-5 sm:gap-8">
+                  <DitherHover />
+                  <div className="relative flex items-baseline gap-5 sm:gap-8">
                     <span className="font-mono text-xs text-muted-foreground/60">
                       {String(i + 1).padStart(2, "0")}
                     </span>
