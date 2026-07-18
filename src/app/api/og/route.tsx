@@ -6,7 +6,7 @@ const FG = "#e9e8e4";
 const MUTED = "#82807b";
 const ACCENT = "#e7b643";
 const HAIRLINE = "rgba(255,255,255,0.08)";
-const GRID_LINE = "rgba(255,255,255,0.02)";
+const GRID_LINE = "rgba(255,255,255,0.25)";
 
 async function loadDmSans(weight: 400 | 600): Promise<ArrayBuffer> {
   const css = await fetch(
@@ -89,16 +89,23 @@ export async function GET(request: NextRequest) {
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
           display: "flex",
-          backgroundImage: `linear-gradient(to right, ${GRID_LINE} 1px, transparent 1px), linear-gradient(to bottom, ${GRID_LINE} 1px, transparent 1px)`,
+          backgroundImage: "linear-gradient(to right, red 50%, blue 50%)",
           backgroundSize: "72px 72px",
+          backgroundRepeat: "repeat",
         }}
       />
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
           display: "flex",
           backgroundImage: `radial-gradient(ellipse at 50% 0%, rgba(13,12,11,0) 25%, ${BG} 78%), radial-gradient(ellipse at 50% 50%, rgba(13,12,11,0) 55%, rgba(13,12,11,0.6) 100%)`,
         }}
@@ -117,6 +124,7 @@ export async function GET(request: NextRequest) {
         <div
           style={{
             display: "flex",
+            gap: "12px",
             fontFamily: "Departure Mono",
             fontSize: 22,
             letterSpacing: "0.18em",
@@ -124,7 +132,8 @@ export async function GET(request: NextRequest) {
             color: MUTED,
           }}
         >
-          <span style={{ color: ACCENT }}>{"// "}</span>0xhckr.dev
+          <span style={{ color: ACCENT }}>{"//"}</span>
+          <span>0xhckr.dev</span>
         </div>
         <div
           style={{
