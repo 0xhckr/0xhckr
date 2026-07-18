@@ -1,11 +1,14 @@
 "use client";
 
+import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "~/lib/auth-client";
+import { api } from "../../../../convex/_generated/api";
 
 export default function SignInPage() {
   const router = useRouter();
+  const hasPasskeys = useQuery(api.auth.hasPasskeys);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [setupOpen, setSetupOpen] = useState(false);
@@ -59,38 +62,42 @@ export default function SignInPage() {
         >
           {loading ? "waiting for passkey..." : "sign in with passkey"}
         </button>
-        <button
-          type="button"
-          onClick={() => setSetupOpen((v) => !v)}
-          className="self-start font-mono text-xs text-foreground/40 underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground/70"
-        >
-          {setupOpen ? "close setup" : "first-time setup"}
-        </button>
-        {setupOpen && (
-          <div className="flex flex-col gap-3">
-            <label
-              htmlFor="setup-token"
-              className="font-mono text-xs text-muted-foreground"
-            >
-              setup token
-            </label>
-            <input
-              id="setup-token"
-              type="password"
-              autoComplete="off"
-              value={setupToken}
-              onChange={(e) => setSetupToken(e.target.value)}
-              className="border hairline bg-input/50 px-3 py-2 font-mono text-sm text-foreground outline-none transition-colors focus:border-foreground/40"
-            />
+        {hasPasskeys === false && (
+          <>
             <button
               type="button"
-              disabled={loading || !setupToken}
-              onClick={handleRegister}
-              className="link-sweep cursor-pointer border hairline px-3 py-2 font-mono text-sm text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50"
+              onClick={() => setSetupOpen((v) => !v)}
+              className="self-start font-mono text-xs text-foreground/40 underline decoration-foreground/20 underline-offset-4 transition-colors hover:text-foreground/70"
             >
-              register passkey
+              {setupOpen ? "close setup" : "first-time setup"}
             </button>
-          </div>
+            {setupOpen && (
+              <div className="flex flex-col gap-3">
+                <label
+                  htmlFor="setup-token"
+                  className="font-mono text-xs text-muted-foreground"
+                >
+                  setup token
+                </label>
+                <input
+                  id="setup-token"
+                  type="password"
+                  autoComplete="off"
+                  value={setupToken}
+                  onChange={(e) => setSetupToken(e.target.value)}
+                  className="border hairline bg-input/50 px-3 py-2 font-mono text-sm text-foreground outline-none transition-colors focus:border-foreground/40"
+                />
+                <button
+                  type="button"
+                  disabled={loading || !setupToken}
+                  onClick={handleRegister}
+                  className="link-sweep cursor-pointer border hairline px-3 py-2 font-mono text-sm text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50"
+                >
+                  register passkey
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@ import { passkey } from "@better-auth/passkey";
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
+import { v } from "convex/values";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
@@ -81,5 +82,16 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return authComponent.getAuthUser(ctx);
+  },
+});
+
+export const hasPasskeys = query({
+  args: {},
+  returns: v.boolean(),
+  handler: async (ctx) => {
+    const has: boolean = await ctx.runQuery(
+      components.betterAuth.passkeys.hasAny,
+    );
+    return has;
   },
 });

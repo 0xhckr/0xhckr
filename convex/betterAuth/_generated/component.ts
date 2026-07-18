@@ -1226,4 +1226,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         Name
       >;
     };
+    passkeys: {
+      hasAny: FunctionReference<"query", "internal", {}, boolean, Name>;
+    };
   };
