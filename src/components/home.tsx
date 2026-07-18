@@ -198,8 +198,7 @@ export function Home() {
                 I build most things with TypeScript, React, and Tailwind.
                 Currently on my journey to learn Rust.
               </p>
-              <div className="hero-meta flex items-center gap-3 font-mono text-xs text-muted-foreground select-none">
-                <span className="inline-block size-1.5 animate-pulse rounded-full bg-accent" />
+              <div className="hero-meta flex items-center font-mono text-xs text-muted-foreground select-none">
                 software developer
               </div>
             </div>
