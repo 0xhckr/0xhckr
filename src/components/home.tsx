@@ -16,17 +16,27 @@ const aboutParagraphs = [
   "Most of my time goes into building web apps, wrangling servers, and convincing everyone that Linux is better than Windows.",
 ];
 
-const projects = [
-  {
-    title: "stoa.gg",
-    href: "https://stoa.gg",
-    description:
-      "A private communications platform like Discord and Slack. Built using Tauri, LiveKit, and React.",
-  },
+const projects: { title: string; href?: string; description: string }[] = [
   {
     title: "thenix.guide",
     href: "https://thenix.guide",
     description: "A guide to Nix and NixOS. (really just a propaganda piece).",
+  },
+  {
+    title: "rocky.systems",
+    href: "https://rocky.systems",
+    description:
+      "A group of friends who get together on Sundays to hack on code.",
+  },
+  {
+    title: "itsasecret.dev",
+    href: "https://itsasecret.dev",
+    description:
+      "A platform for managing secrets and environment variables with your team.",
+  },
+  {
+    title: "???",
+    description: "A development platform. More details soon.",
   },
 ];
 
@@ -67,7 +77,11 @@ const NoscriptContent = () => (
       <h2>What I'm working on.</h2>
       {projects.map((p) => (
         <p key={p.title}>
-          <a href={p.href} target="_blank" rel="noopener noreferrer">
+          <a
+            href={p.href}
+            target={p.href ? "_blank" : undefined}
+            rel={p.href ? "noopener noreferrer" : undefined}
+          >
             {p.title}
           </a>{" "}
           — {p.description}
@@ -237,8 +251,8 @@ export function Home() {
                 <a
                   key={p.title}
                   href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  target={p.href ? "_blank" : undefined}
+                  rel={p.href ? "noopener noreferrer" : undefined}
                   className="fade-up row-hover group block border-t hairline py-8 sm:py-10"
                 >
                   <div className="flex items-baseline gap-5 sm:gap-8">

@@ -11,7 +11,7 @@ export const metadata: Metadata = generatePageMetadata({
   path: "/showcase",
 });
 
-const projects = [
+const projects: { title: string; description: string; link?: string }[] = [
   {
     title: "stoa.gg",
     description: "a private communications platform like discord and slack.",
@@ -26,6 +26,31 @@ const projects = [
     title: "0xhckr.dev",
     description: "my personal portfolio site.",
     link: "https://0xhckr.dev",
+  },
+  {
+    title: "itsasecret.dev",
+    description:
+      "a platform for managing secrets and environment variables with your team.",
+    link: "https://itsasecret.dev",
+  },
+  {
+    title: "rocky.systems",
+    description: "a group of friends who hack on code together every sunday.",
+    link: "https://rocky.systems",
+  },
+  {
+    title: "???",
+    description: "a development platform. more details soon.",
+  },
+  {
+    title: "peep.codes",
+    description: "a build-your-own pr reviewer for your workflows.",
+    link: "https://peep.codes",
+  },
+  {
+    title: "gojo",
+    description: "jj version control with a slick terminal ui.",
+    link: "https://github.com/0xhckr/gojo",
   },
 ];
 
@@ -44,8 +69,8 @@ export default function Showcase() {
             <a
               key={project.title}
               href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              target={project.link ? "_blank" : undefined}
+              rel={project.link ? "noopener noreferrer" : undefined}
               className="reveal-item row-hover group block border-t hairline py-8 sm:py-10"
             >
               <div className="flex items-baseline gap-5 sm:gap-8">
