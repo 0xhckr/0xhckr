@@ -70,29 +70,63 @@ export function CommitGraph() {
   }, []);
 
   const n = days.length;
+  const half = Math.ceil(n / 2);
+  const bandBudget = Math.max(1, (size.h - Math.round(size.h * 0.3)) / 2);
   let cols = Math.max(
     1,
-    Math.round(Math.sqrt((n * size.w) / Math.max(1, size.h))),
+    Math.round(Math.sqrt((Math.max(1, half) * size.w) / bandBudget)),
   );
-  let rows = Math.max(1, Math.ceil(n / cols));
+  let rows = Math.max(1, Math.ceil(half / cols));
   let minPitch = Math.ceil((size.w + GAP) / cols);
-  let maxPitch = Math.max(1, Math.floor((size.h + GAP) / rows));
-  while (minPitch > maxPitch && cols < n) {
+  let maxPitch = Math.max(1, Math.floor((bandBudget + GAP) / rows));
+  while (minPitch > maxPitch && cols < half) {
     cols += 1;
-    rows = Math.max(1, Math.ceil(n / cols));
+    rows = Math.max(1, Math.ceil(half / cols));
     minPitch = Math.ceil((size.w + GAP) / cols);
-    maxPitch = Math.max(1, Math.floor((size.h + GAP) / rows));
+    maxPitch = Math.max(1, Math.floor((bandBudget + GAP) / rows));
   }
   const pitch = minPitch <= maxPitch ? maxPitch : minPitch;
   const cell = Math.max(4, pitch - GAP);
   const gridW = cols * pitch - GAP;
-  const gridH = rows * pitch - GAP;
 
-  const cells = days.map((day, i) => ({
-    day,
-    x: (i % cols) * pitch,
-    y: Math.floor(i / cols) * pitch,
-  }));
+  const totalRows = Math.max(1, Math.ceil(n / cols));
+  const topRows = Math.max(1, Math.floor(totalRows / 2));
+  const split = Math.min(n, topRows * cols);
+  const m = n - split;
+  const rowsBottom = Math.max(1, Math.ceil(m / cols));
+  const bottomY = size.h - (rowsBottom * pitch - GAP);
+  const rem = m % cols;
+
+  const cells: { day: ContributionDay | null; x: number; y: number }[] =
+    days.map((day, i) => {
+      if (i < split) {
+        return {
+          day,
+          x: (i % cols) * pitch,
+          y: Math.floor(i / cols) * pitch,
+        };
+      }
+      const j = i - split;
+      let col: number;
+      let row: number;
+      if (rem > 0 && j < rem) {
+        col = j;
+        row = 0;
+      } else if (rem > 0) {
+        col = (j - rem) % cols;
+        row = 1 + Math.floor((j - rem) / cols);
+      } else {
+        col = j % cols;
+        row = Math.floor(j / cols);
+      }
+      return { day, x: col * pitch, y: bottomY + row * pitch };
+    });
+
+  if (rem > 0) {
+    for (let col = rem; col < cols; col++) {
+      cells.push({ day: null, x: col * pitch, y: bottomY });
+    }
+  }
 
   const offsetX = Math.floor((size.w - gridW) / 2);
 
@@ -104,8 +138,8 @@ export function CommitGraph() {
       {cells.length > 0 && size.w > 0 && size.h > 0 && (
         <svg
           width={gridW}
-          height={gridH}
-          viewBox={`0 0 ${gridW} ${gridH}`}
+          height={size.h}
+          viewBox={`0 0 ${gridW} ${size.h}`}
           shapeRendering="crispEdges"
           aria-hidden="true"
           className="block text-accent"
@@ -115,17 +149,21 @@ export function CommitGraph() {
             if (t instanceof SVGRectElement) {
               const idx = Number(t.getAttribute("data-i"));
               const c = cells[idx];
-              if (c) setHover({ day: c.day, idx, x: e.clientX, y: e.clientY });
+              if (c?.day)
+                setHover({ day: c.day, idx, x: e.clientX, y: e.clientY });
+              else setHover(null);
             }
           }}
           onMouseLeave={() => setHover(null)}
         >
           {cells.map((c, i) => {
             const base =
-              c.day.level === 0 ? LEVEL_OPACITY[0] : LEVEL_OPACITY[c.day.level];
+              !c.day || c.day.level === 0
+                ? LEVEL_OPACITY[0]
+                : LEVEL_OPACITY[c.day.level];
             return (
               <rect
-                key={c.day.date}
+                key={c.day ? c.day.date : `pad-${c.x}`}
                 data-i={i}
                 x={c.x}
                 y={c.y}
@@ -134,7 +172,7 @@ export function CommitGraph() {
                 fill="currentColor"
                 opacity={hover && hover.idx !== i ? base * 0.5 : base}
                 className={
-                  c.day.level === 0
+                  !c.day || c.day.level === 0
                     ? "text-foreground transition-opacity duration-150"
                     : "text-accent transition-opacity duration-150"
                 }
