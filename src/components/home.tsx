@@ -199,16 +199,7 @@ export function Home() {
       <main id="main-content" tabIndex={-1}>
         {/* hero */}
         <section className="relative flex min-h-svh flex-col justify-center px-5 sm:px-8">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 opacity-70"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, black 0%, transparent 40%, transparent 60%, black 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, black 0%, transparent 40%, transparent 60%, black 100%)",
-            }}
-          >
+          <div aria-hidden="true" className="absolute inset-0 opacity-70">
             <CommitGraph />
           </div>
           <div className="relative z-10 mx-auto w-full max-w-5xl">
