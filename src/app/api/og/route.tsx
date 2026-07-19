@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 const BG = "#0d0c0b";
 const FG = "#e9e8e4";
 const MUTED = "#82807b";
-const ACCENT = "#e7b643";
+const ACCENT = "#00c28c";
 const HAIRLINE = "rgba(255,255,255,0.08)";
 const GRID_LINE = "rgba(255,255,255,0.04)";
 
