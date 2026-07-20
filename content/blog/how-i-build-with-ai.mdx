@@ -1,0 +1,83 @@
+---
+title: How I build with AI
+description: CLI-first AI coding, subscriptions I use, the harness I choose, and the biggest disclaimer for any new developers starting out
+date: 2026-07-19
+---
+
+AI still sits in a somewhat taboo area of conversation especially in the world of software development even though it's being pushed heavily by companies to be adopted. Everywhere you look, there's talks about how X massive company just laid off double digits of their employees. The same companies, then, are often re-hiring those same developers a good chunk of the time. For a new developer entering the field today, or a student just starting out in a CS degree, the future may look uncertain. I hope this post helps you navigate that uncertainty.
+
+## AI is a multiplier, not a substitute
+
+The single truth that we have been able to discern so far from the use of AI is and has been the fact that it multiplies what you already bring to the table. I've had my fair share of speaking to individuals, some very high up on the corporate ladder, and some just barely starting their journeys - If you do not understand the fundamentals, AI will only multiply your mistakes. I've been extremely lucky to have built a solid set of fundamentals before AI ever became widespread.
+
+A bit of a quick background and how I attained these fundamentals in the first place:
+
+I was studying electrical engineering at the University of Alberta and decided in my 3rd year that this just wasn't for me and that I needed to change my path. I had always enjoyed CS and found myself drawn to software development instead of triple-phase power systems. I ended up dropping out and teaching myself programming through doing and failing (kind of like how AI is trained). I was able to land an internship at a pretty well off software consultancy firm and there was a massive pool of extraordinary senior level talent to learn from (I got SO lucky). They're where I learned the fundamentals from.
+
+## What are the fundamentals and why can't AI provide them?
+
+AI, in essence, is a glorified autocomplete tool (just a really massive one that's run on thousands of very expensive GPUs). It can suggest code patterns and complete sentences, but it lacks true understanding. If you start and sound like a NPC level developer, it'll simply auto-complete NCP developer level code. It's crucially important to understand the kinds of points a good developer would make when prompting an AI agent as well as the critical questions that get asked during iterations with AI.
+
+The fundamentals include but are not limited to the following:
+
+- **Problem-solving skills**: Breaking down complex problems into manageable parts
+- **Critical thinking**: Questioning assumptions, evaluating trade-offs, and understanding the "why" behind solutions
+- **System design**: Architecting scalable, maintainable, and efficient solutions that fit real-world constraints
+- **The opposite of System Design**: Understanding when a given problem doesn't need to cater to scalability or performance constraints.
+- **Testing and debugging**: Why testing matters and especially in the context of AI-assisted development.
+- **Research**: Knowing when to look up and how to look up information effectively.
+
+Here's why they're important when working with AI:
+
+- **Problem-solving skills**: AI can suggest solutions and break down complex problems into manageable parts, but it lacks the ability to understand the underlying business context or prioritize which parts of a problem are truly critical. It does not take into account non-negotiables and can often miss the mark on what truly matters.
+- **Critical thinking**: AI can generate words that can convince a regular person as to why it did something but a proper developer will be able to correctly question the AI and its hallucinations.
+- **System design**: AI can suggest architecture patterns and code structures, but it has no method of evaluating whether those patterns actually fit the specific constraints and requirements of your project.
+- **The opposite of System Design**: The opposite of the point above.
+- **Testing and debugging**: AI can generate test cases and debug code fast. As it runs out of context on difficult tasks or as the task itself evolves, test cases help the AI verify its own work and catch mistakes it might have made.
+- **Research**: AI can provide information, and do research but sometimes it does this wonderful thing called "going in circles". We like spending our tokens wisely here. We do not let the AI go in circles - as humans we have the capability to give AI answers it otherwise would have burnt half its context on.
+
+Moving onto *how* I build with AI:
+
+## CLI-first
+
+I use AI almost exclusively in CLI form. Maybe it's because I started off as a terminal larper or whatever but I now genuinely think that it's arguably the best way to use AI (in a coding context). Here's why:
+
+- I can use tools like [herdr](https://github.com/ogulcancelik/herdr) (my fork: <https://github.com/0xhckr/herdr>) to orchestrate my tabs and manage multiple AI agents simultaneously.
+- My AI agents live right next to the various commands I'll be running so it's more ergonomic in that sense.
+- My AI agents work with terminal commands half the time anyways.
+- My version control and diff viewer tool, [gojo](https://github.com/0xhckr/gojo), is a TUI and so that also lives in the terminal.
+- There's less overhead since I don't need to download yet another electronjs based AI app.
+
+## Subscriptions over API keys
+
+I strongly prefer AI subscriptions over pay-per-token API billing. It's simple math: I use these tools heavily, every day, across many projects. If I do $3000 in API calls that I could've achieved with a subscription costing $100, that's a 30x return on investment. Do I think it's going to continue being this cheap for inference? Definitely not. Might as well lock it in while it lasts.
+
+## The harness matters as much as the model
+
+Something people underrate: the model is only half the equation. The *harness* - the program that wraps the model, feeds it context, gives it tools, and decides what it can do - matters just as much if not even more. The same model in two different harnesses can feel like two different products. For background, much of this website was redesigned using Kimi K3 but not using the kimi-code tool but rather OpenCode.
+
+A good harness gives the model the right tools (file editing with exact matching instead of "rewrite the whole file and pray"), manages context intelligently (compacting, summarizing, not blowing the window on irrelevant files), supports agents and subagents for parallel work, has sane permission systems so you're not approving every single read and also not allowing the agent to `rm -rf / --no-preserve-root`, and lets you configure behavior via files like `AGENTS.md` that live in your repo. A bad harness starves a great model of context or buries a good answer under janky UX. Sometimes bad harnesses are even worse because they'll allow the model to keep going in loops forever and ever and ever and - yeah.
+
+## pi, claude-code, and opencode
+
+I've put real time into three harnesses: pi, claude-code, and opencode. All three are good. None are perfect (... maybe I should make my own... 👀).
+
+**pi** is minimal and fast, and I respect the philosophy of a tiny, hackable core you shape yourself. If it did that and had a mode where I could turn it into a full-screen TUI, it would be perfect.
+
+**claude-code** is the polished offering from Anthropic. It's pretty good and has shown a lot of promise with, funnily enough, Sol 5.6 and Kimi K3, but my biggest gripe is that it doesn't show its thinking processes. Oftentimes I can easily spot a bad line of reasoning early on, hit escape, provide the agent with additional context or fortify previously made decisions. With claude-code, I can't do that.
+
+**opencode** is what I landed on, for two reasons. First: it's a decent set of defaults. Not that big a fan of the keybinds, but it has a nice permission model, solid agent/subagent support, `AGENTS.md` conventions (which, can I just say, maybe we should all just conform to this one at this point *erhm* @Anthropic and a couple others), LSP integration, session management - and more. It has sane defaults, stores no memory about me (which, if you're working on many different projects, which, with AI is definitely possible, then it's a blessing for your contexts not getting cluttered), and has a pretty nice full-screen TUI experience with a todo list on the side.
+
+## What this actually looks like day to day
+
+In practice: I open opencode in a project, describe what I want in plain language, and let it work. I review the code diffs as they happen and monitor the agent's thinking processes, and wait. In the interim, I often go clean up the workspace, check in on PRs from other team members, and explore the codebase to understand the context better myself.
+
+This workflow allows me to build super fast. The problem then becomes reviewing. If you have massive multi-thousand line changes, no human will be able to review it all effectively. This is where AI comes in yet again. We have tools like [coderabbit](https://coderabbit.ai/) or [peep](https://peep.codes/) that automatically reviews incoming PRs for you. It's extremely important to note that these tools are not replacements for human oversight - they're assistants that help surface issues faster but they're not perfect (not that us humans ever were either). I use this in addition to a quick once over of the set of changes. I view the AI-generated review first to keep a mental model of what's been done and where it seems to be finding the most issues and then drill into the details myself.
+
+## The biggest disclaimer + conclusion
+
+If you're just starting out in software development today, here's something you have to hear from some guy on the internet: **AI is not a substitute for learning how to code (unless you use it like a professor and ask it questions but even then, I'd recommend doing it via hands-on practice and actual studying of the fundamentals since sometimes AI can hallucinate and we can't have our professor doing that).** It might feel like you're skipping the fundamentals because you can ask an AI to write code for you, but without understanding the underlying concepts, you'll find yourself stuck when the AI fails to do something specific or when you need to debug complex issues.
+
+Furthermore, if I can say anything confidently right now, it's that your manager (unless they were a previous software developer) will not be able to generate good code out of the AI. I do believe the barrier is lower and I also believe that we'll need either less software engineers or we'll only be looking to accept higher-level developers who understand the fundamentals. So with that being said, if you're just starting out, and I mean this sincerely, **get gud**. We're moving to a world where AI allows senior level developers to move at breakneck speeds. Our goal is to solidify the fundamentals so we can truly harness AI's power and not cause the slopocalypse - essentially jumping to a senior-ish level ourselves. It's a gargantuan ask, yes, but the talent is very much still needed and if you're one of the people who are hoping just to coast by in your CS degree - I guess best of luck (it'll be rough for you).
+
+btw this article was written by a human. The site might've been built with AI, but your words and ideas should always be your own. stay hungry and humble y'all <3.
