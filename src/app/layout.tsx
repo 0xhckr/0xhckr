@@ -108,8 +108,10 @@ export default async function RootLayout({
             <AmbientBackground />
             <Navbar />
             <AdminNavbar />
-            <main className="relative z-10 min-h-svh">{children}</main>
-            <Footer />
+            <div className="flex min-h-svh flex-col">
+              <main className="relative z-10 flex-1">{children}</main>
+              <Footer />
+            </div>
           </PageLoader>
         </Providers>
       </body>
