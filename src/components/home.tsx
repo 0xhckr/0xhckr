@@ -7,9 +7,9 @@ import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CommitGraph } from "~/components/commit-graph";
 import { DitherHover } from "~/components/dither-hover";
-import { PixelMountains } from "~/components/pixel-mountains";
 import { ScrambleText } from "~/components/scramble-text";
 import { onPageReady } from "~/lib/page-ready";
+import { contactLinks, projects } from "~/lib/site-data";
 import { cn } from "~/lib/util";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -18,41 +18,6 @@ const aboutParagraphs = [
   "I also dabble in a lot of homelabbing projects — currently self-hosting dokploy, pyrodactyl, and home assistant.",
   "I love and use NixOS and Nix on a daily basis. Reproducible builds, declarative config, pinned versioning for projects — it really is one of the best things I've ever integrated into my workflow.",
   "Most of my time goes into building web apps, wrangling servers, and convincing everyone that Linux is better than Windows.",
-];
-
-const projects: { title: string; href?: string; description: string }[] = [
-  {
-    title: "thenix.guide",
-    href: "https://thenix.guide",
-    description: "A guide to Nix and NixOS. (really just a propaganda piece).",
-  },
-  {
-    title: "rocky.systems",
-    href: "https://rocky.systems",
-    description:
-      "A group of friends who get together on Sundays to hack on code.",
-  },
-  {
-    title: "itsasecret.dev",
-    href: "https://itsasecret.dev",
-    description:
-      "A platform for managing secrets and environment variables with your team.",
-  },
-  {
-    title: "???",
-    description: "A development platform. More details soon.",
-  },
-];
-
-const contactLinks = [
-  { label: "github", href: "https://github.com/0xhckr", meta: "@0xhckr" },
-  { label: "x", href: "https://x.com/0xhckrdev", meta: "@0xhckrdev" },
-  {
-    label: "linkedin",
-    href: "https://linkedin.com/in/mohammadalahdal",
-    meta: "mohammadalahdal",
-  },
-  { label: "email", href: "mailto:hello@0xhckr.dev", meta: "hello@0xhckr.dev" },
 ];
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
@@ -290,70 +255,6 @@ export function Home() {
             </div>
           </div>
         </section>
-
-        {/* footer */}
-        <footer className="border-t hairline">
-          <div className="mx-auto grid max-w-5xl gap-12 px-5 py-16 sm:grid-cols-[1.4fr_1fr_1fr] sm:px-8 sm:py-20">
-            <div className="fade-up">
-              <p className="font-sans text-2xl font-semibold tracking-tight">
-                0xhckr<span className="text-accent">.</span>
-              </p>
-            </div>
-            <div className="fade-up">
-              <p className="font-mono text-[0.625rem] tracking-[0.3em] text-accent uppercase">
-                projects
-              </p>
-              <ul className="mt-5 space-y-3">
-                {projects.map((p) => (
-                  <li key={p.title}>
-                    {p.href ? (
-                      <a
-                        href={p.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group font-mono text-sm text-muted-foreground transition-colors hover:text-accent"
-                      >
-                        {p.title}
-                        <ArrowUpRight className="mb-0.5 ml-1.5 inline-block size-3.5 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
-                      </a>
-                    ) : (
-                      <span className="font-mono text-sm text-muted-foreground/50">
-                        {p.title}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="fade-up">
-              <p className="font-mono text-[0.625rem] tracking-[0.3em] text-accent uppercase">
-                elsewhere
-              </p>
-              <ul className="mt-5 space-y-3">
-                {contactLinks.map((l) => (
-                  <li key={l.label}>
-                    <a
-                      href={l.href}
-                      target={
-                        l.href.startsWith("mailto:") ? undefined : "_blank"
-                      }
-                      rel={
-                        l.href.startsWith("mailto:")
-                          ? undefined
-                          : "noopener noreferrer"
-                      }
-                      className="group font-mono text-sm text-muted-foreground transition-colors hover:text-accent"
-                    >
-                      {l.label}
-                      <ArrowUpRight className="mb-0.5 ml-1.5 inline-block size-3.5 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <PixelMountains />
-        </footer>
       </main>
     </div>
   );

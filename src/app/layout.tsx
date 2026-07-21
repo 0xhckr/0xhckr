@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminNavbar } from "~/components/admin-navbar";
+import { Footer } from "~/components/footer";
 import { Navbar } from "~/components/navbar";
 import { PageLoader } from "~/components/page-loader";
 import { Providers } from "~/components/providers";
@@ -107,7 +108,8 @@ export default async function RootLayout({
             <AmbientBackground />
             <Navbar />
             <AdminNavbar />
-            <main className="relative z-10">{children}</main>
+            <main className="relative z-10 min-h-svh">{children}</main>
+            <Footer />
           </PageLoader>
         </Providers>
       </body>
